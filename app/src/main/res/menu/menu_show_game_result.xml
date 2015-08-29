@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:compat="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.tatsuo.baseballrecorder.ShowGameResultActivity">
+
+    <item
+        android:id="@+id/action_edit"
+        android:orderInCategory="100"
+        compat:showAsAction="always|withText"
+        android:title="編集"/>
+
+<!--    android:icon="@drawable/abc_ratingbar_full_material" -->
+
+</menu>

@@ -1,0 +1,63 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:compat="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".GameResultListActivity">
+
+    <!--
+    <item android:id="@+id/action_settings" android:title="@string/action_settings"
+        android:orderInCategory="100" app:showAsAction="never" />
+-->
+    <item
+        android:id="@+id/action_regist"
+        android:orderInCategory="100"
+        compat:showAsAction="always|withText"
+        android:title="追加"/>
+
+    <!--        android:icon="@drawable/abc_ratingbar_full_material" -->
+
+    <!--
+    <item
+        android:id="@+id/action_favorite"
+        android:icon="@drawable/abc_ratingbar_full_material"
+        android:orderInCategory="101"
+        compat:showAsAction="always|withText"
+        android:title="hoge2"/>
+
+    <item
+        android:id="@+id/action_good"
+        android:icon="@drawable/abc_ratingbar_full_material"
+        android:orderInCategory="102"
+        compat:showAsAction="always|withText"
+        android:title="hoge3"/>
+
+    <item
+        android:id="@+id/action_good2"
+        android:icon="@drawable/abc_ratingbar_full_material"
+        android:orderInCategory="103"
+        compat:showAsAction="always|withText"
+        android:title="hoge3"/>
+
+    <item
+        android:id="@+id/action_good3"
+        android:icon="@drawable/abc_ratingbar_full_material"
+        android:orderInCategory="104"
+        compat:showAsAction="always|withText"
+        android:title="hoge3"/>
+
+    <item
+        android:id="@+id/action_good4"
+        android:icon="@drawable/abc_ratingbar_full_material"
+        android:orderInCategory="105"
+        compat:showAsAction="always|withText"
+        android:title="hoge3"/>
+
+    <item
+        android:id="@+id/action_good5"
+        android:icon="@drawable/abc_ratingbar_full_material"
+        android:orderInCategory="106"
+        compat:showAsAction="always|withText"
+        android:title="hoge3"/>
+-->
+
+</menu>

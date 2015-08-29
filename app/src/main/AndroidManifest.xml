@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.tatsuo.baseballrecorder" >
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".GameResultListActivity"
+            android:label="@string/title_activity_game_result_list"
+            android:screenOrientation="portrait"
+            android:uiOptions="splitActionBarWhenNarrow" >
+            <intent-filter android:label="@string/app_name" >
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".InputGameResultActivity"
+            android:label="@string/title_activity_input_game_result" >
+        </activity>
+        <activity
+            android:name=".ShowGameResultActivity"
+            android:label="@string/title_activity_show_game_result" >
+        </activity>
+        <activity
+            android:name=".BattingStatisticsActivity"
+            android:label="@string/title_activity_batting_statistics" >
+        </activity>
+        <activity
+            android:name=".BattingAnalysisActivity"
+            android:label="@string/title_activity_batting_analysis" >
+        </activity>
+
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+
+    </application>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+</manifest>
