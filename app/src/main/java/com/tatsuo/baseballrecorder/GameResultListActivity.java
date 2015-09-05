@@ -1,34 +1,44 @@
 package com.tatsuo.baseballrecorder;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
 import com.tatsuo.baseballrecorder.domain.ConfigManager;
 import com.tatsuo.baseballrecorder.domain.GameResult;
 import com.tatsuo.baseballrecorder.domain.GameResultManager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class GameResultListActivity extends CommonAdsActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // GoogleAnalytics初期化
+        ((AnalyticsApplication)getApplication()).getTracker();
+
+        // テストデータ作成用
+        if(ConfigManager.makeTestData){
+            GameResultManager.makeTestData(this);
+        }
+
         setContentView(R.layout.activity_game_result_list);
 
         Button toBattingStatButton = (Button)findViewById(R.id.to_batting_stat);
@@ -41,6 +51,20 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
         ConfigManager.saveUpdateGameResultFlg(this, ConfigManager.VIEW_GAME_RESULT_LIST, false);
 
         makeAdsView();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // GoogleAnalytics開始
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
+    }
+
+    @Override
+    protected void onStop() {
+        // GoogleAnalytics停止
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
+        super.onStop();
     }
 
     @Override
@@ -88,12 +112,11 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
         resultListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Map<String, String> gameTitleMap = (Map<String, String>) parent.getItemAtPosition(position);
-                int targetResultId = Integer.parseInt(gameTitleMap.get("resultId"));
+                GameResult gameResult = (GameResult)parent.getItemAtPosition(position);
 
                 // 試合結果照会画面に遷移
                 Intent intent = new Intent(GameResultListActivity.this, ShowGameResultActivity.class);
-                intent.putExtra("RESULTID", targetResultId);
+                intent.putExtra("RESULTID", gameResult.getResultId());
                 startActivity(intent);
             }
         });
@@ -113,19 +136,7 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
             tutorialText.setVisibility(View.GONE);
         }
 
-        List<Map<String, String>> gameTitleMapList = new ArrayList<Map<String, String>>();
-        for(GameResult gameResult : gameResultList) {
-            Map<String, String> gameTitleMap = new HashMap<String, String>();
-            gameTitleMap.put("Title", gameResult.getTitleString());
-            gameTitleMap.put("SubTitle", gameResult.getSubTitleString());
-            gameTitleMap.put("resultId", Integer.toString(gameResult.getResultId()));
-            gameTitleMapList.add(gameTitleMap);
-        }
-
-        SimpleAdapter adapter = new SimpleAdapter(this, gameTitleMapList,
-                android.R.layout.simple_list_item_2,
-                new String[] { "Title", "SubTitle" },
-                new int[] { android.R.id.text1, android.R.id.text2 });
+        GameResultListAdapter adapter = new GameResultListAdapter(this, gameResultList);
 
         resultListView.setAdapter(adapter);
     }
@@ -178,6 +189,52 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
     private void moveBattingAnalysisActivity(){
         Intent intent = new Intent(this, BattingAnalysisActivity.class);
         startActivity(intent);
+    }
+
+    class GameResultListAdapter extends BaseAdapter {
+        private Context context = null;
+        private LayoutInflater layoutInflater = null;
+        private List<GameResult> gameResultList = null;
+
+        public GameResultListAdapter(Context context, List<GameResult> gameResultList) {
+            this.context = context;
+            this.layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            this.gameResultList = gameResultList;
+        }
+
+        @Override
+        public int getCount() {
+            return gameResultList.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return gameResultList.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return gameResultList.get(position).getResultId();
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            convertView = layoutInflater.inflate(R.layout.game_result_list_row, parent, false);
+
+            TextView titleView = (TextView)convertView.findViewById(R.id.row_title);
+            TextView subtitleView = (TextView)convertView.findViewById(R.id.row_subtitle);
+            GameResult gameResult = gameResultList.get(position);
+
+            titleView.setText(gameResult.getTitleString());
+            subtitleView.setText(gameResult.getSubTitleString());
+
+            // リスト項目のタップを横幅全体にきかせるようにするためTextViewの横幅を広げる
+            DisplayMetrics dm = Resources.getSystem().getDisplayMetrics();
+            titleView.setWidth(dm.widthPixels);
+
+            return convertView;
+        }
+
     }
 
 }

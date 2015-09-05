@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import com.socdm.d.adgeneration.ADG;
 import com.socdm.d.adgeneration.ADGConsts;
 import com.socdm.d.adgeneration.ADGListener;
+import com.tatsuo.baseballrecorder.domain.ConfigManager;
 
 /**
  * Created by tatsuo on 2015/08/26.
@@ -18,6 +19,10 @@ public class CommonAdsActivity extends AppCompatActivity {
     protected static boolean isAds = false;
 
     protected void makeAdsView(){
+        if(ConfigManager.showAds == false){
+            return;
+        }
+
         // 広告生成
         LinearLayout adsLayout = (LinearLayout)findViewById(R.id.ads);
         if(adsLayout.getVisibility() == View.INVISIBLE) {

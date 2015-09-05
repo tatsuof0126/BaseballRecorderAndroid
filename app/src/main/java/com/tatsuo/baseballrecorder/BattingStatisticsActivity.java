@@ -1,7 +1,10 @@
 package com.tatsuo.baseballrecorder;
 
+import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -13,6 +16,8 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.tatsuo.baseballrecorder.domain.BattingStatistics;
 import com.tatsuo.baseballrecorder.domain.ConfigManager;
 import com.tatsuo.baseballrecorder.domain.GameResult;
@@ -21,9 +26,13 @@ import com.tatsuo.baseballrecorder.domain.StatRange;
 import com.tatsuo.baseballrecorder.domain.TeamStatistics;
 import com.tatsuo.baseballrecorder.util.Utility;
 
+import java.io.File;
 import java.util.List;
 
 public class BattingStatisticsActivity extends CommonStatisticsActivity implements View.OnClickListener {
+
+    private TeamStatistics teamStatistics = null;
+    private BattingStatistics battingStatistics = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +44,9 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
 
         Button shareButton = (Button)findViewById(R.id.share_button);
         shareButton.setOnClickListener(this);
+
+        Button imageShareButton = (Button)findViewById(R.id.image_share_button);
+        imageShareButton.setOnClickListener(this);
 
         makeStatView();
 
@@ -72,8 +84,8 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
 
         List<GameResult> gameResultList = GameResultManager.loadGameResultList(this, statRange, false);
 
-        TeamStatistics teamStatistics = TeamStatistics.calculateTeamStatistics(gameResultList);
-        BattingStatistics battingStatistics = BattingStatistics.calculateBattingStatistics(gameResultList);
+        teamStatistics = TeamStatistics.calculateTeamStatistics(gameResultList);
+        battingStatistics = BattingStatistics.calculateBattingStatistics(gameResultList);
 
         TextView gameText = (TextView)findViewById(R.id.game);
         gameText.setText(teamStatistics.getWin()+"勝 "+teamStatistics.getLose()+"敗 "
@@ -151,6 +163,9 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
             case R.id.share_button:
                 shareButton();
                 break;
+            case R.id.image_share_button:
+                imageShareButton();
+                break;
         }
     }
 
@@ -158,9 +173,144 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
         timePicker();
     }
 
+
     private void shareButton(){
+        StringBuilder shareString = new StringBuilder();
 
+        addStatTitle(shareString);
 
+        shareString.append(battingStatistics.getBoxs()+"打席"+
+                battingStatistics.getAtbats()+"打数"+ battingStatistics.getHits()+"安打"+
+                        " 打率"+Utility.getFloatString3(battingStatistics.getAverage())+
+                        " 出塁率"+Utility.getFloatString3(battingStatistics.getObp())+
+                        " 長打率"+Utility.getFloatString3(battingStatistics.getSlg())+
+                        " OPS"+Utility.getFloatString3(battingStatistics.getOps())+" ");
+
+        if(battingStatistics.getDoubles() > 0) {
+            shareString.append("二塁打"+battingStatistics.getDoubles());
+        }
+
+        if(battingStatistics.getTriples() > 0) {
+            shareString.append("三塁打"+battingStatistics.getTriples());
+        }
+
+        if(battingStatistics.getHomeruns() > 0) {
+            shareString.append("本塁打"+battingStatistics.getHomeruns());
+        }
+
+        if(battingStatistics.getStrikeouts() > 0) {
+            shareString.append("三振"+battingStatistics.getStrikeouts());
+        }
+
+        if(battingStatistics.getWalks() > 0) {
+            shareString.append("四死球"+battingStatistics.getWalks());
+        }
+
+        if(battingStatistics.getSacrifices() > 0) {
+            shareString.append("犠打"+battingStatistics.getSacrifices());
+        }
+
+        if(battingStatistics.getDaten() > 0) {
+            shareString.append("打点"+battingStatistics.getDaten());
+        }
+
+        if(battingStatistics.getTokuten() > 0) {
+            shareString.append("得点"+battingStatistics.getTokuten());
+        }
+
+        if(battingStatistics.getSteal() > 0) {
+            shareString.append("盗塁"+battingStatistics.getSteal());
+        }
+        shareString.append(" です。 #ベボレコ https://play.google.com/store/apps/details?id=com.tatsuo.baseballrecorder");
+
+        // Intentで送信
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, shareString.toString());
+        startActivity(intent);
+
+        Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
+        tracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Button").setAction("Push").setLabel("打撃成績画面―シェア").build());
+
+    }
+
+    private void imageShareButton(){
+        File file = new File(Environment.getExternalStorageDirectory() + "/capture.png");
+        file.getParentFile().mkdir();
+
+        // ボタンを一時的に消す
+        Button changeButton = (Button)findViewById(R.id.change_button);
+        Button shareButton = (Button)findViewById(R.id.share_button);
+        Button imageShareButton = (Button)findViewById(R.id.image_share_button);
+        changeButton.setVisibility(View.GONE);
+        shareButton.setVisibility(View.GONE);
+        imageShareButton.setVisibility(View.GONE);
+
+        // 「草野球日記 ベボレコ」という文言を一時的に出す
+        TextView signatureText = (TextView)findViewById(R.id.signature_text);
+        signatureText.setVisibility(View.VISIBLE);
+
+        // Viewをキャプチャ
+        LinearLayout targetView = (LinearLayout)findViewById(R.id.main_layout);
+        Utility.saveCapture(targetView, file);
+
+        // 表示を戻す
+        changeButton.setVisibility(View.VISIBLE);
+        shareButton.setVisibility(View.VISIBLE);
+        imageShareButton.setVisibility(View.VISIBLE);
+        signatureText.setVisibility(View.INVISIBLE);
+
+        // シェアする文字列を作成
+        StringBuilder shareString = new StringBuilder();
+
+        addStatTitle(shareString);
+
+        shareString.append(battingStatistics.getBoxs() + "打席" +
+                battingStatistics.getAtbats() + "打数" + battingStatistics.getHits() + "安打" +
+                " 打率" + Utility.getFloatString3(battingStatistics.getAverage()) +
+                " 出塁率" + Utility.getFloatString3(battingStatistics.getObp()) +
+                " 長打率" + Utility.getFloatString3(battingStatistics.getSlg()) +
+                " OPS" + Utility.getFloatString3(battingStatistics.getOps()) + " ");
+
+        shareString.append(" です。 #ベボレコ https://play.google.com/store/apps/details?id=com.tatsuo.baseballrecorder");
+
+        // Intentで送信
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.setType("image/png");
+        intent.putExtra(Intent.EXTRA_TEXT, shareString.toString());
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(intent);
+
+        Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
+        tracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Button").setAction("Push").setLabel("打撃成績画面―画像でシェア").build());
+
+    }
+
+    private void addStatTitle(StringBuilder stringBuilder){
+        StatRange statRange = ConfigManager.loadStatRange(this);
+
+        switch (statRange.getType()){
+            case StatRange.TYPE_ALL:
+                if("".equals(statRange.getTeam()) == false){
+                    stringBuilder.append(statRange.getTeam()+"での");
+                }
+                stringBuilder.append("通算打撃成績は、");
+                break;
+            case StatRange.TYPE_YEAR:
+            case StatRange.TYPE_MONTH:
+            case StatRange.TYPE_RECENT5:
+                stringBuilder.append(statRange.getStatTimeString()+"の");
+                if("".equals(statRange.getTeam()) == false){
+                    stringBuilder.append(statRange.getTeam()+"での");
+                }
+                stringBuilder.append("打撃成績は、");
+                break;
+        }
     }
 
 }

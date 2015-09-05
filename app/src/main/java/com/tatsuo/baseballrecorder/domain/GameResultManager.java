@@ -3,13 +3,12 @@ package com.tatsuo.baseballrecorder.domain;
 import android.app.Activity;
 import android.util.Log;
 
-import com.google.android.gms.games.Game;
-
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class GameResultManager {
             String fileName = "gameresult"+gameResult.getResultId()+".dat";
             String writeString = gameResult.getGameResultString();
 
-android.util.Log.i(fileName, writeString);
+            // android.util.Log.i(fileName, writeString);
 
             FileOutputStream fileOutputStream = activity.openFileOutput(fileName, Activity.MODE_PRIVATE);
             fileOutputStream.write(writeString.getBytes());
@@ -37,10 +36,19 @@ android.util.Log.i(fileName, writeString);
     }
 
     public static List loadGameResultList(Activity activity){
-        String[] fileList = activity.fileList();
-
         List resultList = new ArrayList();
-        for(String fileName : fileList){
+
+        String[] fileList = activity.fileList();
+        List<String> selectedFileList = new ArrayList<String>();
+
+        // 試合結果ファイルに絞る
+        for(String fileName : fileList) {
+            if(fileName.contains("gameresult")){
+                selectedFileList.add(fileName);
+            }
+        }
+
+        for(String fileName : selectedFileList){
             resultList.add(loadGameResult(activity, fileName));
         }
 
@@ -119,7 +127,7 @@ android.util.Log.i(fileName, writeString);
             stringBuilder.deleteCharAt(stringBuilder.length()-1); // 最終行の改行を削除
             reader.close();
 
-android.util.Log.i(fileName, stringBuilder.toString());
+            // android.util.Log.i(fileName, stringBuilder.toString());
 
             gameResult = GameResult.makeGameResult(stringBuilder.toString());
         } catch (IOException e) {
@@ -176,6 +184,143 @@ android.util.Log.i(fileName, stringBuilder.toString());
         }
 
         return teamList;
+    }
+
+    public static void makeTestData(Activity activity){
+        GameResult gameResult = new GameResult();
+        gameResult.setResultId(0);
+        gameResult.setYear(2015);
+        gameResult.setMonth(8);
+        gameResult.setDay(30);
+        gameResult.setPlace("光が丘公園");
+        gameResult.setMyteam("杉並タイガース");
+        gameResult.setOtherteam("蒲田オリオンズ");
+        gameResult.setMyscore(5);
+        gameResult.setOtherscore(2);
+        gameResult.setDaten(1);
+        gameResult.setTokuten(2);
+        gameResult.setSteal(1);
+        gameResult.setBattingResultList(Arrays.asList(
+                new BattingResult(6, 1), new BattingResult(7, 7),
+                new BattingResult(9, 8), new BattingResult(0, 12),
+                new BattingResult(4, 4)
+        ));
+        saveGameResult(activity, gameResult);
+
+        gameResult = new GameResult();
+        gameResult.setResultId(1);
+        gameResult.setYear(2015);
+        gameResult.setMonth(8);
+        gameResult.setDay(5);
+        gameResult.setPlace("光が丘公園");
+        gameResult.setMyteam("杉並タイガース");
+        gameResult.setOtherteam("練馬ダイコンズ");
+        gameResult.setMyscore(6);
+        gameResult.setOtherscore(3);
+        gameResult.setDaten(0);
+        gameResult.setTokuten(0);
+        gameResult.setSteal(0);
+        gameResult.setBattingResultList(Arrays.asList(
+                new BattingResult(1, 11), new BattingResult(9, 2),
+                new BattingResult(6, 5), new BattingResult(0, 15),
+                new BattingResult(11, 8)
+        ));
+        saveGameResult(activity, gameResult);
+
+        gameResult = new GameResult();
+        gameResult.setResultId(2);
+        gameResult.setYear(2015);
+        gameResult.setMonth(7);
+        gameResult.setDay(25);
+        gameResult.setPlace("光が丘公園");
+        gameResult.setMyteam("杉並タイガース");
+        gameResult.setOtherteam("蒲田オリオンズ");
+        gameResult.setMyscore(4);
+        gameResult.setOtherscore(6);
+        gameResult.setDaten(0);
+        gameResult.setTokuten(0);
+        gameResult.setSteal(0);
+        gameResult.setBattingResultList(Arrays.asList(
+                new BattingResult(4, 1), new BattingResult(8, 7),
+                new BattingResult(0, 12), new BattingResult(8, 2)
+        ));
+        saveGameResult(activity, gameResult);
+
+        gameResult = new GameResult();
+        gameResult.setResultId(3);
+        gameResult.setYear(2015);
+        gameResult.setMonth(7);
+        gameResult.setDay(10);
+        gameResult.setPlace("光が丘公園");
+        gameResult.setMyteam("杉並タイガース");
+        gameResult.setOtherteam("品川ファイターズ");
+        gameResult.setMyscore(7);
+        gameResult.setOtherscore(0);
+        gameResult.setDaten(0);
+        gameResult.setTokuten(0);
+        gameResult.setSteal(0);
+        gameResult.setBattingResultList(Arrays.asList(
+                new BattingResult(7, 2), new BattingResult(10, 10),
+                new BattingResult(0, 14), new BattingResult(8, 8)
+        ));
+        saveGameResult(activity, gameResult);
+
+        gameResult = new GameResult();
+        gameResult.setResultId(4);
+        gameResult.setYear(2015);
+        gameResult.setMonth(6);
+        gameResult.setDay(15);
+        gameResult.setPlace("光が丘公園");
+        gameResult.setMyteam("杉並タイガース");
+        gameResult.setOtherteam("世田谷ジャイアンツ");
+        gameResult.setMyscore(5);
+        gameResult.setOtherscore(5);
+        gameResult.setDaten(0);
+        gameResult.setTokuten(0);
+        gameResult.setSteal(0);
+        gameResult.setBattingResultList(Arrays.asList(
+                new BattingResult(7, 8), new BattingResult(6, 3),
+                new BattingResult(4, 1), new BattingResult(6, 7)
+        ));
+        saveGameResult(activity, gameResult);
+
+        gameResult = new GameResult();
+        gameResult.setResultId(5);
+        gameResult.setYear(2015);
+        gameResult.setMonth(5);
+        gameResult.setDay(22);
+        gameResult.setPlace("光が丘公園");
+        gameResult.setMyteam("杉並タイガース");
+        gameResult.setOtherteam("練馬ダイコンズ");
+        gameResult.setMyscore(3);
+        gameResult.setOtherscore(7);
+        gameResult.setDaten(3);
+        gameResult.setTokuten(1);
+        gameResult.setSteal(1);
+        gameResult.setBattingResultList(Arrays.asList(
+                new BattingResult(5, 6), new BattingResult(7, 7),
+                new BattingResult(9, 2), new BattingResult(4, 1)
+        ));
+        saveGameResult(activity, gameResult);
+
+        gameResult = new GameResult();
+        gameResult.setResultId(6);
+        gameResult.setYear(2015);
+        gameResult.setMonth(5);
+        gameResult.setDay(5);
+        gameResult.setPlace("光が丘公園");
+        gameResult.setMyteam("杉並タイガース");
+        gameResult.setOtherteam("練馬ダイコンズ");
+        gameResult.setMyscore(6);
+        gameResult.setOtherscore(4);
+        gameResult.setDaten(1);
+        gameResult.setTokuten(0);
+        gameResult.setSteal(1);
+        gameResult.setBattingResultList(Arrays.asList(
+                new BattingResult(6, 2), new BattingResult(7, 2),
+                new BattingResult(8, 7), new BattingResult(0, 13)
+        ));
+        saveGameResult(activity, gameResult);
     }
 
     private static int getNewResultId(Activity activity){

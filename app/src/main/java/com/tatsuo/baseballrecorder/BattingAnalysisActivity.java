@@ -1,7 +1,10 @@
 package com.tatsuo.baseballrecorder;
 
+import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -13,12 +16,16 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.tatsuo.baseballrecorder.domain.ConfigManager;
 import com.tatsuo.baseballrecorder.domain.GameResult;
 import com.tatsuo.baseballrecorder.domain.GameResultManager;
 import com.tatsuo.baseballrecorder.domain.StatRange;
+import com.tatsuo.baseballrecorder.util.Utility;
 import com.tatsuo.baseballrecorder.view.AnalysisView;
 
+import java.io.File;
 import java.util.List;
 
 public class BattingAnalysisActivity extends CommonStatisticsActivity implements View.OnClickListener {
@@ -115,7 +122,40 @@ public class BattingAnalysisActivity extends CommonStatisticsActivity implements
     }
 
     private void shareButton(){
+        File file = new File(Environment.getExternalStorageDirectory() + "/capture.png");
+        file.getParentFile().mkdir();
 
+        // ボタンを一時的に消す
+        Button changeButton = (Button)findViewById(R.id.change_button);
+        Button shareButton = (Button)findViewById(R.id.share_button);
+        changeButton.setVisibility(View.GONE);
+        shareButton.setVisibility(View.GONE);
+
+        // 「草野球日記 ベボレコ」という文言を一時的に出す
+        TextView signatureText = (TextView)findViewById(R.id.signature_text);
+        signatureText.setVisibility(View.VISIBLE);
+
+        // Viewをキャプチャ
+        LinearLayout targetView = (LinearLayout)findViewById(R.id.main_layout);
+        Utility.saveCapture(targetView, file);
+
+        // 表示を戻す
+        changeButton.setVisibility(View.VISIBLE);
+        shareButton.setVisibility(View.VISIBLE);
+        signatureText.setVisibility(View.INVISIBLE);
+
+        // Intentで送信
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.setType("image/png");
+        intent.putExtra(Intent.EXTRA_TEXT, "「草野球日記 ベボレコ」で打撃分析を行いました。 #ベボレコ https://play.google.com/store/apps/details?id=com.tatsuo.baseballrecorder");
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(intent);
+
+        Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
+        tracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Button").setAction("Push").setLabel("打撃分析画面―画像でシェア").build());
 
     }
 

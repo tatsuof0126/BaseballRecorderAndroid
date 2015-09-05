@@ -16,7 +16,8 @@
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:id="@+id/main_layout">
 
                 <LinearLayout
                     android:orientation="horizontal"
@@ -116,7 +117,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="【打撃成績】"
+                        android:text="【打撃成績】 "
                         android:id="@+id/textView24" />
 
                     <Button
@@ -125,6 +126,17 @@
                         android:layout_height="wrap_content"
                         android:text="シェア"
                         android:id="@+id/share_button" />
+
+                    <Space
+                        android:layout_width="20px"
+                        android:layout_height="20px" />
+
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="画像でシェア"
+                        android:id="@+id/image_share_button" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -347,7 +359,17 @@
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"></LinearLayout>
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical|right">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="草野球日記 ベボレコ "
+                        android:id="@+id/signature_text"
+                        android:visibility="invisible" />
+                </LinearLayout>
 
                 <LinearLayout
                     android:orientation="horizontal"

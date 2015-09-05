@@ -14,6 +14,8 @@ public class ConfigManager {
     public static final int VIEW_SHOW_GAME_RESULT = 2;
     public static final int[] VIEW_LIST = {VIEW_GAME_RESULT_LIST, VIEW_SHOW_GAME_RESULT};
 
+    public static boolean showAds = true;
+    public static boolean makeTestData = false;
 
     public static StatRange loadStatRange(Activity activity) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);

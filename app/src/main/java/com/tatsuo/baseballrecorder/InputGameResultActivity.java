@@ -18,6 +18,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.tatsuo.baseballrecorder.domain.BattingResult;
 import com.tatsuo.baseballrecorder.domain.ConfigManager;
 import com.tatsuo.baseballrecorder.domain.GameResult;
@@ -310,11 +312,24 @@ public class InputGameResultActivity extends CommonAdsActivity implements View.O
         targetGameResult.setSteal(Integer.parseInt(stealStr));
         targetGameResult.setMemo(memoStr);
 
+        // 登録か更新かを判断
+        boolean registFlg = (targetGameResult.getResultId() == GameResult.NON_REGISTED);
+
         GameResultManager.saveGameResult(this, targetGameResult);
         ConfigManager.saveUpdateGameResultFlg(this, ConfigManager.VIEW_ALL, true);
 
-        Toast.makeText(this, "登録しました", Toast.LENGTH_LONG).show();
-//        Toast.makeText(this, "登録しました : "+targetGameResult.getResultId(), Toast.LENGTH_LONG).show();
+        if(registFlg){
+            Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
+            tracker.send(new HitBuilders.EventBuilder()
+                    .setCategory("Button").setAction("Push").setLabel("打撃成績入力画面―登録").build());
+            Toast.makeText(this, "登録しました", Toast.LENGTH_LONG).show();
+        } else {
+            Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
+            tracker.send(new HitBuilders.EventBuilder()
+                    .setCategory("Button").setAction("Push").setLabel("打撃成績入力画面―更新").build());
+            Toast.makeText(this, "保存しました", Toast.LENGTH_LONG).show();
+        }
+
         finish();
     }
 

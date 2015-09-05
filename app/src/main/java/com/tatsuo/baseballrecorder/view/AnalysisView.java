@@ -137,8 +137,8 @@ public class AnalysisView extends View {
                         targetY = targetHomerunPoint[position-7][1];
                     }
 
-                    targetX = targetX + (float)Math.random()*10 - 5f;
-                    targetY = targetY + (float)Math.random()*10 - 5f;
+                    targetX = targetX + ((float)Math.random()*10 - 5f) * density;
+                    targetY = targetY + ((float)Math.random()*10 - 5f) * density;
 
                     if(targetY < 1.0f){
                         targetY = 1.0f;
