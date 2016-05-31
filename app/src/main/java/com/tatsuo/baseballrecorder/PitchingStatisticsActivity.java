@@ -17,26 +17,27 @@ import android.widget.TextView;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.tatsuo.baseballrecorder.domain.BattingStatistics;
 import com.tatsuo.baseballrecorder.domain.ConfigManager;
 import com.tatsuo.baseballrecorder.domain.GameResult;
 import com.tatsuo.baseballrecorder.domain.GameResultManager;
+import com.tatsuo.baseballrecorder.domain.PitchingStatistics;
 import com.tatsuo.baseballrecorder.domain.StatRange;
-import com.tatsuo.baseballrecorder.domain.TeamStatistics;
 import com.tatsuo.baseballrecorder.util.Utility;
 
 import java.io.File;
 import java.util.List;
 
-public class BattingStatisticsActivity extends CommonStatisticsActivity implements View.OnClickListener {
+/**
+ * Created by tatsuo on 2016/05/08.
+ */
+public class PitchingStatisticsActivity extends CommonStatisticsActivity implements View.OnClickListener {
 
-    private TeamStatistics teamStatistics = null;
-    private BattingStatistics battingStatistics = null;
+    private PitchingStatistics pitchingStatistics = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_batting_statistics);
+        setContentView(R.layout.activity_pitching_statistics);
 
         ((Button)findViewById(R.id.change_button)).setOnClickListener(this);
         ((Button)findViewById(R.id.share_button)).setOnClickListener(this);
@@ -48,26 +49,26 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
     }
 
     @Override
-    protected void adjustViewHeight(){
+    protected void adjustViewHeight() {
         DisplayMetrics dm = Resources.getSystem().getDisplayMetrics();
         int height = dm.heightPixels;
         float density = dm.density;
 
         int header = 81; //dp
-        int headerpx = (int)(header * density + 0.5f); // 0.5fは四捨五入用
+        int headerpx = (int) (header * density + 0.5f); // 0.5fは四捨五入用
 
         int ads = isAds ? 50 : 0; //dp
-        int adspx = (int)(ads * density + 0.5f);
+        int adspx = (int) (ads * density + 0.5f);
 
         int viewHeight = height - (headerpx + adspx);
 
-        ScrollView scrollView = (ScrollView)findViewById(R.id.scrollView);
+        ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView);
         scrollView.setLayoutParams(new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, viewHeight));
     }
 
     @Override
-    protected void makeStatView(){
+    protected void makeStatView() {
         StatRange statRange = ConfigManager.loadStatRange(this);
 
         TextView timeText = (TextView)findViewById(R.id.time);
@@ -76,65 +77,65 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
         TextView teamText = (TextView)findViewById(R.id.team);
         teamText.setText(statRange.getTeamString());
 
-        List<GameResult> gameResultList = GameResultManager.loadGameResultList(this, statRange, false);
+        List<GameResult> gameResultList = GameResultManager.loadGameResultList(this, statRange, true);
+        pitchingStatistics = PitchingStatistics.calculatePitchingStatistics(gameResultList);
 
-        teamStatistics = TeamStatistics.calculateTeamStatistics(gameResultList);
-        battingStatistics = BattingStatistics.calculateBattingStatistics(gameResultList);
+        TextView pitchingResultText = (TextView)findViewById(R.id.pitching_result);
+        pitchingResultText.setText(pitchingStatistics.getGames()+"試合 "
+                +pitchingStatistics.getWin()+"勝 "+pitchingStatistics.getLose()+"敗 "
+                +pitchingStatistics.getSave()+"セーブ "+pitchingStatistics.getHold()+"ホールド");
 
-        TextView gameText = (TextView)findViewById(R.id.game);
-        gameText.setText(teamStatistics.getWin()+"勝 "+teamStatistics.getLose()+"敗 "
-                +teamStatistics.getDraw()+"分  勝率 "+teamStatistics.getShoritsuString());
+        TextView eraText = (TextView)findViewById(R.id.era);
+        eraText.setText(Utility.getFloatString2(pitchingStatistics.getEra()));
 
-        TextView battingStatsText = (TextView)findViewById(R.id.batting);
-        battingStatsText.setText(battingStatistics.getBoxs()+"打席 "+battingStatistics.getAtbats()+"打数 "+
-                battingStatistics.getHits()+"安打");
+        TextView shoritsuext = (TextView)findViewById(R.id.shoritsu);
+        shoritsuext.setText(Utility.getFloatString3(pitchingStatistics.getShoritsu()));
 
-        TextView doublesText = (TextView)findViewById(R.id.doubles);
-        doublesText.setText(""+battingStatistics.getDoubles());
+        TextView inningStrText = (TextView)findViewById(R.id.inningstr);
+        inningStrText.setText(pitchingStatistics.getInningString());
 
-        TextView triplesText = (TextView)findViewById(R.id.triples);
-        triplesText.setText(""+battingStatistics.getTriples());
+        TextView hiandaText = (TextView)findViewById(R.id.hianda);
+        hiandaText.setText(String.valueOf(pitchingStatistics.getHianda()));
 
-        TextView homerunsText = (TextView)findViewById(R.id.homeruns);
-        homerunsText.setText(""+battingStatistics.getHomeruns());
+        TextView hihomerunText = (TextView)findViewById(R.id.hihomerun);
+        hihomerunText.setText(String.valueOf(pitchingStatistics.getHihomerun()));
 
-        TextView strikeoutsText = (TextView)findViewById(R.id.strikeouts);
-        strikeoutsText.setText(""+battingStatistics.getStrikeouts());
+        TextView dassanshinText = (TextView)findViewById(R.id.dassanshin);
+        dassanshinText.setText(String.valueOf(pitchingStatistics.getDassanshin()));
 
-        TextView walksText = (TextView)findViewById(R.id.walks);
-        walksText.setText(""+battingStatistics.getWalks());
+        TextView yoshikyuText = (TextView)findViewById(R.id.yoshikyu);
+        yoshikyuText.setText(String.valueOf(pitchingStatistics.getYoshikyu()));
 
-        TextView sacrificesText = (TextView)findViewById(R.id.sacrifices);
-        sacrificesText.setText(""+battingStatistics.getSacrifices());
+        TextView yoshikyu2Text = (TextView)findViewById(R.id.yoshikyu2);
+        yoshikyu2Text.setText(String.valueOf(pitchingStatistics.getYoshikyu2()));
 
-        TextView datenText = (TextView)findViewById(R.id.daten);
-        datenText.setText(""+battingStatistics.getDaten());
+        TextView shittenText = (TextView)findViewById(R.id.shitten);
+        shittenText.setText(String.valueOf(pitchingStatistics.getShitten()));
 
-        TextView tokutenText = (TextView)findViewById(R.id.tokuten);
-        tokutenText.setText(""+battingStatistics.getTokuten());
+        TextView jisekitenText = (TextView)findViewById(R.id.jisekiten);
+        jisekitenText.setText(String.valueOf(pitchingStatistics.getJisekiten()));
 
-        TextView stealText = (TextView)findViewById(R.id.steal);
-        stealText.setText(""+battingStatistics.getSteal());
+        TextView kantoText = (TextView)findViewById(R.id.kanto);
+        kantoText.setText(String.valueOf(pitchingStatistics.getKanto()));
 
-        TextView stats1Text = (TextView)findViewById(R.id.stats1);
-        stats1Text.setText("打率 "+Utility.getFloatString3(battingStatistics.getAverage())
-            +"  出塁率 "+Utility.getFloatString3(battingStatistics.getObp())
-                +"  長打率 "+Utility.getFloatString3(battingStatistics.getSlg()));
+        TextView whipText = (TextView)findViewById(R.id.whip);
+        whipText.setText(Utility.getFloatString2(pitchingStatistics.getWhip()));
 
-        TextView stats2Text = (TextView)findViewById(R.id.stats2);
-        stats2Text.setText("OPS "+Utility.getFloatString3(battingStatistics.getOps())
-                +"   IsoD "+Utility.getFloatString3(battingStatistics.getIsod())
-                +"   IsoP "+Utility.getFloatString3(battingStatistics.getIsop()));
+        TextView k9Text = (TextView)findViewById(R.id.k9);
+        k9Text.setText(Utility.getFloatString2(pitchingStatistics.getK9()));
 
-        TextView stats3Text = (TextView)findViewById(R.id.stats3);
-        stats3Text.setText("RC27 " + Utility.getFloatString2(battingStatistics.getRc27()));
+        TextView kbbText = (TextView)findViewById(R.id.kbb);
+        kbbText.setText(Utility.getFloatString2(pitchingStatistics.getKbb()));
+
+        TextView fipText = (TextView)findViewById(R.id.fip);
+        fipText.setText(Utility.getFloatString2(pitchingStatistics.getFip()));
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_batting_statistics, menu);
+        getMenuInflater().inflate(R.menu.menu_pitching_statistics, menu);
         return true;
     }
 
@@ -172,55 +173,45 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
         timePicker();
     }
 
-
     private void shareButton(){
         StringBuilder shareString = new StringBuilder();
 
         addStatTitle(shareString);
 
-        shareString.append(battingStatistics.getBoxs() + "打席" +
-                battingStatistics.getAtbats() + "打数" + battingStatistics.getHits() + "安打" +
-                " 打率" + Utility.getFloatString3(battingStatistics.getAverage()) +
-                " 出塁率" + Utility.getFloatString3(battingStatistics.getObp()) +
-                " 長打率" + Utility.getFloatString3(battingStatistics.getSlg()) +
-                " OPS" + Utility.getFloatString3(battingStatistics.getOps())+" ");
+        shareString.append(pitchingStatistics.getGames() + "試合"
+                + pitchingStatistics.getWin() + "勝" + pitchingStatistics.getLose() + "敗"
+                + pitchingStatistics.getSave() + "S" + pitchingStatistics.getHold() + "H");
 
-        if(battingStatistics.getDoubles() > 0) {
-            shareString.append("二塁打"+battingStatistics.getDoubles()+" ");
+        shareString.append(" 防御率" + Utility.getFloatString2(pitchingStatistics.getEra())
+                + " 勝率" + Utility.getFloatString3(pitchingStatistics.getShoritsu()));
+
+        shareString.append(" 投球回"+pitchingStatistics.getInningString());
+
+        if(pitchingStatistics.getHianda() != 0) {
+            shareString.append(" 被安打" + pitchingStatistics.getHianda());
+        }
+        if(pitchingStatistics.getHihomerun() != 0){
+            shareString.append(" 被本塁打"+pitchingStatistics.getHihomerun());
+        }
+        if(pitchingStatistics.getDassanshin() != 0) {
+            shareString.append(" 奪三振" + pitchingStatistics.getDassanshin());
+        }
+        if(pitchingStatistics.getYoshikyu() != 0) {
+            shareString.append(" 与四球" + pitchingStatistics.getYoshikyu());
+        }
+        if(pitchingStatistics.getYoshikyu2() != 0) {
+            shareString.append(" 与死球" + pitchingStatistics.getYoshikyu2());
         }
 
-        if(battingStatistics.getTriples() > 0) {
-            shareString.append("三塁打"+battingStatistics.getTriples()+" ");
-        }
+        shareString.append(" 失点"+pitchingStatistics.getShitten());
+        shareString.append(" 自責点"+pitchingStatistics.getJisekiten());
+        shareString.append(" 完投"+pitchingStatistics.getKanto());
+        shareString.append(" WHIP"+Utility.getFloatString2(pitchingStatistics.getWhip()));
+        shareString.append(" 奪三振率"+Utility.getFloatString2(pitchingStatistics.getK9()));
+        shareString.append(" K/BB"+Utility.getFloatString2(pitchingStatistics.getKbb()));
+        shareString.append(" FIP"+Utility.getFloatString2(pitchingStatistics.getFip()));
 
-        if(battingStatistics.getHomeruns() > 0) {
-            shareString.append("本塁打"+battingStatistics.getHomeruns()+" ");
-        }
-
-        if(battingStatistics.getStrikeouts() > 0) {
-            shareString.append("三振"+battingStatistics.getStrikeouts()+" ");
-        }
-
-        if(battingStatistics.getWalks() > 0) {
-            shareString.append("四死球"+battingStatistics.getWalks()+" ");
-        }
-
-        if(battingStatistics.getSacrifices() > 0) {
-            shareString.append("犠打"+battingStatistics.getSacrifices()+" ");
-        }
-
-        if(battingStatistics.getDaten() > 0) {
-            shareString.append("打点"+battingStatistics.getDaten()+" ");
-        }
-
-        if(battingStatistics.getTokuten() > 0) {
-            shareString.append("得点"+battingStatistics.getTokuten()+" ");
-        }
-
-        if(battingStatistics.getSteal() > 0) {
-            shareString.append("盗塁"+battingStatistics.getSteal()+" ");
-        }
-        shareString.append("です。 #ベボレコ");
+        shareString.append(" です。 #ベボレコ");
 
         // Intentで送信
         Intent intent = new Intent();
@@ -231,8 +222,7 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
 
         Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
         tracker.send(new HitBuilders.EventBuilder()
-                .setCategory("Button").setAction("Push").setLabel("打撃成績画面―シェア").build());
-
+                .setCategory("Button").setAction("Push").setLabel("投手成績画面―シェア").build());
     }
 
     private void imageShareButton(){
@@ -266,12 +256,12 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
 
         addStatTitle(shareString);
 
-        shareString.append(battingStatistics.getBoxs() + "打席" +
-                battingStatistics.getAtbats() + "打数" + battingStatistics.getHits() + "安打" +
-                " 打率" + Utility.getFloatString3(battingStatistics.getAverage()) +
-                " 出塁率" + Utility.getFloatString3(battingStatistics.getObp()) +
-                " 長打率" + Utility.getFloatString3(battingStatistics.getSlg()) +
-                " OPS" + Utility.getFloatString3(battingStatistics.getOps()) + " ");
+        shareString.append(pitchingStatistics.getGames() + "試合" + pitchingStatistics.getWin() + "勝"
+                + pitchingStatistics.getLose() + "敗" + pitchingStatistics.getSave() + "セーブ"
+                + pitchingStatistics.getHold() + "ホールド");
+
+        shareString.append(" 防御率" + Utility.getFloatString2(pitchingStatistics.getEra())
+                + " 勝率" + Utility.getFloatString3(pitchingStatistics.getShoritsu()));
 
         shareString.append(" です。 #ベボレコ https://play.google.com/store/apps/details?id=com.tatsuo.baseballrecorder");
 
@@ -286,7 +276,7 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
 
         Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
         tracker.send(new HitBuilders.EventBuilder()
-                .setCategory("Button").setAction("Push").setLabel("打撃成績画面―画像でシェア").build());
+                .setCategory("Button").setAction("Push").setLabel("投手成績画面―画像でシェア").build());
 
     }
 
@@ -298,7 +288,7 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
                 if("".equals(statRange.getTeam()) == false){
                     stringBuilder.append(statRange.getTeam()+"での");
                 }
-                stringBuilder.append("通算打撃成績は、");
+                stringBuilder.append("通算投手成績は、");
                 break;
             case StatRange.TYPE_YEAR:
             case StatRange.TYPE_MONTH:
@@ -307,7 +297,7 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
                 if("".equals(statRange.getTeam()) == false){
                     stringBuilder.append(statRange.getTeam()+"での");
                 }
-                stringBuilder.append("打撃成績は、");
+                stringBuilder.append("投手成績は、");
                 break;
         }
     }

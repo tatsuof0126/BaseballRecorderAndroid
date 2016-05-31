@@ -5,12 +5,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -33,11 +34,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class InputGameResultActivity extends CommonAdsActivity implements View.OnFocusChangeListener, View.OnClickListener {
+public class InputGameResultActivity extends CommonAdsActivity
+        implements View.OnFocusChangeListener, View.OnClickListener {
 
     private static final int NO_TARGET = -999;
     private GameResult targetGameResult = null;
     private int targetBattingResult = NO_TARGET;
+
+    private static final int MOVE_PITCHING = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +53,6 @@ public class InputGameResultActivity extends CommonAdsActivity implements View.O
 
         if(resultId != NO_TARGET){
             targetGameResult = GameResultManager.loadGameResult(this, resultId);
-            makeGameResultView();
         } else {
             targetGameResult = new GameResult();
 
@@ -58,23 +61,36 @@ public class InputGameResultActivity extends CommonAdsActivity implements View.O
             targetGameResult.setMonth(calendar.get(Calendar.MONTH) + 1);
             targetGameResult.setDay(calendar.get(Calendar.DATE));
 
-            makeGameResultView();
+            // 場所と自チームについては過去データが１種類ならそれをデフォルトにする
+            List<GameResult> gameResultList = GameResultManager.loadGameResultList(this);
+            String defaultPlace = null;
+            String defaultMyteam = null;
+            for(GameResult gameResult : gameResultList){
+                if(defaultPlace == null){
+                    defaultPlace = gameResult.getPlace();
+                } else if(defaultPlace.equals(gameResult.getPlace()) == false){
+                    defaultPlace = "";
+                }
+
+                if(defaultMyteam == null){
+                    defaultMyteam = gameResult.getMyteam();
+                } else if(defaultMyteam.equals(gameResult.getMyteam()) == false){
+                    defaultMyteam = "";
+                }
+            }
+            targetGameResult.setPlace(defaultPlace);
+            targetGameResult.setMyteam(defaultMyteam);
         }
 
-        Button saveButton = (Button)findViewById(R.id.save_button);
-        saveButton.setOnClickListener(this);
+        makeGameResultView();
 
-//        Button backButton = (Button)findViewById(R.id.back_button);
-//        backButton.setOnClickListener(this);
+        ((Button)findViewById(R.id.save_button)).setOnClickListener(this);
+        ((Button)findViewById(R.id.add_button)).setOnClickListener(this);
+        ((Button)findViewById(R.id.modify_button)).setOnClickListener(this);
+        ((Button)findViewById(R.id.delete_button)).setOnClickListener(this);
 
-        Button addButton = (Button)findViewById(R.id.add_button);
-        addButton.setOnClickListener(this);
-
-        Button modifyButton = (Button)findViewById(R.id.modify_button);
-        modifyButton.setOnClickListener(this);
-
-        Button deleteButton = (Button)findViewById(R.id.delete_button);
-        deleteButton.setOnClickListener(this);
+        // インタースティシャル広告（動画）を準備
+        prepareVideoAds();
 
         makeAdsView();
     }
@@ -113,18 +129,53 @@ public class InputGameResultActivity extends CommonAdsActivity implements View.O
         int id = item.getItemId();
 
         switch(id) {
-//            case R.id.action_save:
-//                saveButton();
-//                return true;
+            case R.id.action_pitching:
+                movePitchingActivity();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    private void movePitchingActivity(){
+        // 入力チェックを実施
+        String errorMsg = inputCheck();
+
+        // 入力エラーがあればToastを出して次に進まない
+        if("".equals(errorMsg) == false) {
+            Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // targetGameResultを更新
+        updateTargetGameResult();
+
+        Intent intent = new Intent(this, InputPitchingResultActivity.class);
+        intent.putExtra("GAME_RESULT", targetGameResult);
+        startActivityForResult(intent, MOVE_PITCHING);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        switch (resultCode) {
+            case InputPitchingResultActivity.RESULT_TO_BATTING:
+                targetGameResult = (GameResult)intent.getSerializableExtra("GAME_RESULT");
+                break;
+            case InputPitchingResultActivity.RESULT_SAVED:
+                // インタースティシャル広告（動画）を表示
+                showVideoAds();
+                finish();
+                break;
+            case RESULT_CANCELED:
+                break;
+        }
+    }
+
     private void makeGameResultView(){
         EditText yearText = (EditText)findViewById(R.id.year);
         yearText.setText(Integer.toString(targetGameResult.getYear()));
-        yearText.setOnFocusChangeListener(this);
+        // yearText.setOnFocusChangeListener(this);
         yearText.setNextFocusDownId(R.id.month);
 
         EditText monthText = (EditText)findViewById(R.id.month);
@@ -181,9 +232,6 @@ public class InputGameResultActivity extends CommonAdsActivity implements View.O
     @Override
     public void onClick(View v){
         switch (v.getId()) {
-//            case R.id.back_button:
-//                backButton();
-//                break;
             case R.id.save_button:
                 saveButton();
                 break;
@@ -224,11 +272,66 @@ public class InputGameResultActivity extends CommonAdsActivity implements View.O
         }
     }
 
-    private void backButton(){
+    private void saveButton() {
+        // 入力チェックを実施
+        String errorMsg = inputCheck();
+
+        // 入力エラーがあればToastを出して次に進まない
+        if ("".equals(errorMsg) == false) {
+            Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("試合結果を保存します。\nよろしいですか？");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                saveGameResult();
+            }
+        });
+        builder.setNegativeButton("キャンセル", null);
+        builder.show();
+    }
+
+    private void saveGameResult(){
+        // targetGameResultを更新
+        updateTargetGameResult();
+
+        // 登録か更新かを判断
+        boolean registFlg = (targetGameResult.getResultId() == GameResult.NON_REGISTED);
+
+        GameResultManager.saveGameResult(this, targetGameResult);
+        ConfigManager.saveUpdateGameResultFlg(this, ConfigManager.VIEW_ALL, true);
+
+        if(registFlg){
+            Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
+            tracker.send(new HitBuilders.EventBuilder()
+                    .setCategory("Button").setAction("Push").setLabel("打撃成績入力画面―登録").build());
+            Toast.makeText(this, "登録しました", Toast.LENGTH_LONG).show();
+        } else {
+            Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
+            tracker.send(new HitBuilders.EventBuilder()
+                    .setCategory("Button").setAction("Push").setLabel("打撃成績入力画面―更新").build());
+            Toast.makeText(this, "保存しました", Toast.LENGTH_LONG).show();
+        }
+
+        // インタースティシャル広告（動画）を表示
+        showVideoAds();
+
         finish();
     }
 
-    private void saveButton(){
+    private String inputCheck(){
+        String errorMsg = "";
+
+        // キーボードを閉じてフォーカスを移動
+        ScrollView scrollView = (ScrollView)findViewById(R.id.scrollView);
+        InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(scrollView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        LinearLayout adsView = (LinearLayout)findViewById(R.id.ads);
+        adsView.requestFocus();
+
         // 入力値を取得
         String yearStr = ((EditText)findViewById(R.id.year)).getText().toString();
         String monthStr = ((EditText)findViewById(R.id.month)).getText().toString();
@@ -285,20 +388,53 @@ public class InputGameResultActivity extends CommonAdsActivity implements View.O
         }
 
         if(noinputcheck) {
-            Toast.makeText(this, "入力されていない項目があります", Toast.LENGTH_SHORT).show();
-            return;
+            errorMsg = "入力されていない項目があります";
+            // Toast.makeText(this, "入力されていない項目があります", Toast.LENGTH_SHORT).show();
+            // return;
         }
 
         if(datecheck) {
-            Toast.makeText(this, "日付が正しくありません", Toast.LENGTH_SHORT).show();
-            return;
+            errorMsg = "日付が正しくありません";
+            // Toast.makeText(this, "日付が正しくありません", Toast.LENGTH_SHORT).show();
+            // return;
         }
 
         if(numbercheck) {
-            Toast.makeText(this, "数値の入力が正しくありません", Toast.LENGTH_SHORT).show();
-            return;
+            errorMsg = "数値の入力が正しくありません";
+            // Toast.makeText(this, "数値の入力が正しくありません", Toast.LENGTH_SHORT).show();
+            // return;
         }
 
+        return errorMsg;
+    }
+
+    private void updateTargetGameResult(){
+        // 入力値を取得
+        String yearStr = ((EditText)findViewById(R.id.year)).getText().toString();
+        String monthStr = ((EditText)findViewById(R.id.month)).getText().toString();
+        String dayStr = ((EditText)findViewById(R.id.day)).getText().toString();
+        String placeStr = ((EditText)findViewById(R.id.place)).getText().toString();
+        String myteamStr = ((EditText)findViewById(R.id.myteam)).getText().toString();
+        String otherteamStr = ((EditText)findViewById(R.id.otherteam)).getText().toString();
+        String myscoreStr = ((EditText)findViewById(R.id.myscore)).getText().toString();
+        String otherscoreStr = ((EditText)findViewById(R.id.otherscore)).getText().toString();
+        String datenStr = ((EditText)findViewById(R.id.daten)).getText().toString();
+        String tokutenStr = ((EditText)findViewById(R.id.tokuten)).getText().toString();
+        String stealStr = ((EditText)findViewById(R.id.steal)).getText().toString();
+        String memoStr = ((EditText)findViewById(R.id.memo)).getText().toString();
+
+        // 半角カンマを全角に変換
+        placeStr = Utility.replaceComma(placeStr);
+        myteamStr = Utility.replaceComma(myteamStr);
+        otherteamStr = Utility.replaceComma(otherteamStr);
+        memoStr = Utility.replaceComma(memoStr);
+
+        // 必須項目はtrim
+        placeStr = placeStr.trim();
+        myteamStr = myteamStr.trim();
+        otherteamStr = otherteamStr.trim();
+
+        // targetGameResultを更新
         targetGameResult.setYear(Integer.parseInt(yearStr));
         targetGameResult.setMonth(Integer.parseInt(monthStr));
         targetGameResult.setDay(Integer.parseInt(dayStr));
@@ -311,30 +447,11 @@ public class InputGameResultActivity extends CommonAdsActivity implements View.O
         targetGameResult.setTokuten(Integer.parseInt(tokutenStr));
         targetGameResult.setSteal(Integer.parseInt(stealStr));
         targetGameResult.setMemo(memoStr);
-
-        // 登録か更新かを判断
-        boolean registFlg = (targetGameResult.getResultId() == GameResult.NON_REGISTED);
-
-        GameResultManager.saveGameResult(this, targetGameResult);
-        ConfigManager.saveUpdateGameResultFlg(this, ConfigManager.VIEW_ALL, true);
-
-        if(registFlg){
-            Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory("Button").setAction("Push").setLabel("打撃成績入力画面―登録").build());
-            Toast.makeText(this, "登録しました", Toast.LENGTH_LONG).show();
-        } else {
-            Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory("Button").setAction("Push").setLabel("打撃成績入力画面―更新").build());
-            Toast.makeText(this, "保存しました", Toast.LENGTH_LONG).show();
-        }
-
-        finish();
     }
 
-    private void addButton(){
-        showResultPicker(NO_TARGET);
+    private void addButton() {
+        showResultPicker1(NO_TARGET);
+//        showResultPicker(NO_TARGET);
     }
 
     private void modifyButton(){
@@ -343,6 +460,64 @@ public class InputGameResultActivity extends CommonAdsActivity implements View.O
 
     private void deleteButton(){
         showSelectResultPickerForDelete();
+    }
+
+    private void showResultPicker1(int target){
+        targetBattingResult = target;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("打席の結果を選択");
+        builder.setItems(BattingResult.PICKER1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(BattingResult.NEEDS_POSITION[i]){
+                    showResultPicker2(i);
+                } else {
+                    makeBattingResult2(i);
+                }
+            }
+        });
+        builder.show();
+    }
+
+    private void showResultPicker2(final int result){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("打席の結果を選択");
+        builder.setItems(BattingResult.PICKER2, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                makeBattingResult2(result, i);
+            }
+        });
+        builder.show();
+    }
+
+    private void makeBattingResult2(int picker1){
+        BattingResult battingResult = null;
+        if(picker1 == 0){
+            battingResult = new BattingResult(12);
+        }
+        if(picker1 == 1){
+            battingResult = new BattingResult(14);
+        }
+        if(picker1 == 2){
+            battingResult = new BattingResult(15);
+        }
+        if(picker1 == 16){
+            battingResult = new BattingResult(13);
+        }
+        if(picker1 == 17){
+            battingResult = new BattingResult(16);
+        }
+
+        if(battingResult != null) {
+            updateBattingResult(battingResult);
+        }
+    }
+
+    private void makeBattingResult2(int picker1, int picker2){
+        int position = picker1 - 2;
+        int result = picker2 + 1;
+        updateBattingResult(new BattingResult(position, result));
     }
 
     private void showResultPicker(int target){
@@ -364,7 +539,7 @@ public class InputGameResultActivity extends CommonAdsActivity implements View.O
         builder.setItems(BattingResult.POSITIONS_PICKER, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                makeBattingResult(i+1, result);
+                makeBattingResult(i + 1, result);
             }
         });
         builder.show();
@@ -391,7 +566,8 @@ public class InputGameResultActivity extends CommonAdsActivity implements View.O
         builder.setItems(makeResultStringList(), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                showResultPicker(i);
+                // showResultPicker(i);
+                showResultPicker1(i);
             }
         });
         builder.show();
@@ -414,7 +590,7 @@ public class InputGameResultActivity extends CommonAdsActivity implements View.O
         List<String> pickerStringList = new ArrayList<String>();
         for(int i=0;i<battingResultList.size();i++){
             BattingResult battingResult = battingResultList.get(i);
-            String pickerString = "第"+(i+1)+"打席 "+battingResult.getBattingResultString();
+            String pickerString = "第"+(i+1)+"打席 "+battingResult.getBattingResultString(false);
             pickerStringList.add(pickerString);
         }
 
@@ -455,7 +631,7 @@ public class InputGameResultActivity extends CommonAdsActivity implements View.O
             textView.setTextSize(17f);
 
             TextView textView2 = new TextView(this);
-            textView2.setText(battingResult.getBattingResultString());
+            textView2.setText(Html.fromHtml(battingResult.getBattingResultString(true)));
             textView2.setTextSize(17f);
 
             layout.addView(textView);

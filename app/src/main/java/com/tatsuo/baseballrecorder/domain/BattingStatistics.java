@@ -26,6 +26,9 @@ public class BattingStatistics {
     private float obp;
     private float slg;
     private float ops;
+    private float isod;
+    private float isop;
+    private float rc27;
 
     public int getHits() {
         return hits;
@@ -171,6 +174,30 @@ public class BattingStatistics {
         this.ops = ops;
     }
 
+    public float getIsod() {
+        return isod;
+    }
+
+    public void setIsod(float isod) {
+        this.isod = isod;
+    }
+
+    public float getIsop() {
+        return isop;
+    }
+
+    public void setIsop(float isop) {
+        this.isop = isop;
+    }
+
+    public float getRc27() {
+        return rc27;
+    }
+
+    public void setRc27(float rc27) {
+        this.rc27 = rc27;
+    }
+
     public static BattingStatistics calculateBattingStatistics(List<GameResult> gameResultList){
         BattingStatistics battingStatistics = new BattingStatistics();
 
@@ -211,6 +238,24 @@ public class BattingStatistics {
 
         // OPS＝出塁率＋長打率
         ops = obp + slg;
+
+        // IsoD＝出塁率ー打率
+        isod = obp - average;
+
+        // IsoP＝長打率ー打率
+        isop = slg - average;
+
+        // RC27＝https://ja.wikipedia.org/wiki/RC_%28%E9%87%8E%E7%90%83%29
+        // 出塁能力A = 安打 + 四球 + 死球 - 盗塁死 - 併殺打
+        // 進塁能力B = 塁打 + 0.26 ×（四球 + 死球） + 0.53 ×（犠飛 + 犠打） + 0.64 × 盗塁 - 0.03 × 三振
+        // 出塁機会C = 打数 + 四球 + 死球 + 犠飛 + 犠打
+        // RC =（A+2.4×C）×（B+3×C）÷(9×C)－0.9×C
+        // RC27 = RC÷（打数－安打＋盗塁死＋犠打＋犠飛＋併殺打）×27
+        float a = hits + walks; // TODO 盗塁死を併殺打を引く
+        float b = (float)((singles+doubles*2+triples*3+homeruns*4) + walks*0.26 + sacrifices*0.53 + steal*0.64 - strikeouts*0.03);
+        float c = atbats + walks + sacrifices;
+        float rc = (float)((a+2.4*c) * (b+3*c) / (9*c) - 0.9*c);
+        rc27 = rc / (float)(atbats - hits + sacrifices) * 27; // TODO 盗塁死を併殺打を加える
     }
 
 }

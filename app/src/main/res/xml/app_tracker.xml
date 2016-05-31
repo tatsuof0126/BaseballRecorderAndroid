@@ -11,6 +11,9 @@
     <screenName name="com.tatsuo.baseballrecorder.InputGameResultActivity">
         InputGameResultActivity
     </screenName>
+    <screenName name="com.tatsuo.baseballrecorder.InputPitchingResultActivity">
+        InputPitchingResultActivity
+    </screenName>
     <screenName name="com.tatsuo.baseballrecorder.ShowGameResultActivity">
         ShowGameResultActivity
     </screenName>
@@ -19,6 +22,9 @@
     </screenName>
     <screenName name="com.tatsuo.baseballrecorder.BattingAnalysisActivity">
         BattingAnalysisActivity
+    </screenName>
+    <screenName name="com.tatsuo.baseballrecorder.PitchingStatisticsActivity">
+        PitchingStatisticsActivity
     </screenName>
     <!--  The following value should be replaced with correct property id. -->
     <string name="ga_trackingId">UA-23529359-6</string>

@@ -3,8 +3,10 @@
     <string name="title_activity_game_result_list">試合結果一覧</string>
     <string name="title_activity_show_game_result">試合結果</string>
     <string name="title_activity_input_game_result">試合結果入力</string>
+    <string name="title_activity_input_pitching_result">試合結果入力</string>
     <string name="title_activity_batting_statistics">打撃成績</string>
     <string name="title_activity_batting_analysis">打撃分析</string>
+    <string name="title_activity_pitching_statistics">投手成績</string>
 
     <string name="hello_world">hello_world</string>
     <string name="action_settings">hello_world</string>

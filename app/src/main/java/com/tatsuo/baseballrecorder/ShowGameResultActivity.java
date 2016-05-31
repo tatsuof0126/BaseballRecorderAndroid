@@ -5,8 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,11 +39,8 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_game_result);
 
-        Button shareButton = (Button)findViewById(R.id.share_button);
-        shareButton.setOnClickListener(this);
-
-        Button deleteButton = (Button)findViewById(R.id.delete_button);
-        deleteButton.setOnClickListener(this);
+        ((Button)findViewById(R.id.share_button)).setOnClickListener(this);
+        ((Button)findViewById(R.id.delete_button)).setOnClickListener(this);
 
         Intent intent = getIntent();
         int resultId = intent.getIntExtra("RESULTID", NO_TARGET);
@@ -56,6 +53,9 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
 
         updateResultView();
         ConfigManager.saveUpdateGameResultFlg(this, ConfigManager.VIEW_SHOW_GAME_RESULT, false);
+
+        // インタースティシャル広告（動画）を準備
+        prepareVideoAds();
 
         makeAdsView();
     }
@@ -93,6 +93,7 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
     }
 
     private void updateResultView() {
+        // 試合成績＆打撃成績
         TextView dateText = (TextView)findViewById(R.id.date_text);
         dateText.setText(targetGameResult.getYear() + "年" + targetGameResult.getMonth() + "月"
                 + targetGameResult.getDay() + "日");
@@ -110,6 +111,58 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
         etcText.setText("  打点 " + targetGameResult.getDaten() + "  得点 " + targetGameResult.getTokuten()
                 + "  盗塁 " + targetGameResult.getSteal());
 
+        // 投手成績
+        LinearLayout pitchingTitleLayout = (LinearLayout)findViewById(R.id.pitching_title_layout);
+        LinearLayout pitchingResult1Layout = (LinearLayout)findViewById(R.id.pitching_result1_layout);
+        LinearLayout pitchingResult2Layout = (LinearLayout)findViewById(R.id.pitching_result2_layout);
+        LinearLayout pitchingResult3Layout = (LinearLayout)findViewById(R.id.pitching_result3_layout);
+        LinearLayout pitchingResult4Layout = (LinearLayout)findViewById(R.id.pitching_result4_layout);
+        LinearLayout pitchingResult5Layout = (LinearLayout)findViewById(R.id.pitching_result5_layout);
+
+        if(targetGameResult.getInning() == 0 && targetGameResult.getInning2() == 0){
+            pitchingTitleLayout.setVisibility(View.GONE);
+            pitchingResult1Layout.setVisibility(View.GONE);
+            pitchingResult2Layout.setVisibility(View.GONE);
+            pitchingResult3Layout.setVisibility(View.GONE);
+            pitchingResult4Layout.setVisibility(View.GONE);
+            pitchingResult5Layout.setVisibility(View.GONE);
+        } else {
+            pitchingTitleLayout.setVisibility(View.VISIBLE);
+            pitchingResult1Layout.setVisibility(View.VISIBLE);
+            pitchingResult2Layout.setVisibility(View.VISIBLE);
+            pitchingResult3Layout.setVisibility(View.VISIBLE);
+            pitchingResult4Layout.setVisibility(View.VISIBLE);
+            if(targetGameResult.getTamakazu() == GameResult.TAMAKAZU_NONE) {
+                pitchingResult5Layout.setVisibility(View.GONE);
+            } else {
+                pitchingResult5Layout.setVisibility(View.VISIBLE);
+            }
+
+            TextView inningText = (TextView)findViewById(R.id.inning);
+            TextView sekininText = (TextView)findViewById(R.id.sekinin);
+            TextView hiandaText = (TextView)findViewById(R.id.hianda);
+            TextView hihomerunText = (TextView)findViewById(R.id.hihomerun);
+            TextView dassanshinText = (TextView)findViewById(R.id.dassanshin);
+            TextView yoshikyuText = (TextView)findViewById(R.id.yoshikyu);
+            TextView yoshikyu2Text = (TextView)findViewById(R.id.yoshikyu2);
+            TextView shittenText = (TextView)findViewById(R.id.shitten);
+            TextView jisekitenText = (TextView)findViewById(R.id.jisekiten);
+            TextView tamakazuText = (TextView)findViewById(R.id.tamakazu);
+
+            inningText.setText(targetGameResult.getInningString()
+                +(targetGameResult.isKanto() ? "(完投)" : ""));
+            sekininText.setText(Html.fromHtml(targetGameResult.getSekininString(true)));
+            hiandaText.setText(String.valueOf(targetGameResult.getHianda()));
+            hihomerunText.setText(String.valueOf(targetGameResult.getHihomerun()));
+            dassanshinText.setText(String.valueOf(targetGameResult.getDassanshin()));
+            yoshikyuText.setText(String.valueOf(targetGameResult.getYoshikyu()));
+            yoshikyu2Text.setText(String.valueOf(targetGameResult.getYoshikyu2()));
+            shittenText.setText(String.valueOf(targetGameResult.getShitten()));
+            jisekitenText.setText(String.valueOf(targetGameResult.getJisekiten()));
+            tamakazuText.setText(String.valueOf(targetGameResult.getTamakazu()));
+        }
+
+        // メモ
         String memo = targetGameResult.getMemo();
         LinearLayout memoTitleLayout = (LinearLayout)findViewById(R.id.memo_title_layout);
         LinearLayout memoLayout = (LinearLayout)findViewById(R.id.memo_layout);
@@ -143,7 +196,7 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
             textView.setTextSize(17f);
 
             TextView textView2 = new TextView(this);
-            textView2.setText(battingResult.getBattingResultString());
+            textView2.setText(Html.fromHtml(battingResult.getBattingResultString(true)));
             textView2.setTextSize(17f);
 
             layout.addView(textView);
@@ -217,7 +270,10 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
         }
 
         boolean hasBatting = (targetGameResult.getBattingResultList().size() > 0);
-        boolean hasPitching = false; // TODO
+        boolean hasPitching = false;
+        if(targetGameResult.getInning() != 0 || targetGameResult.getInning2() != 0){
+            hasPitching = true;
+        }
 
         if(hasBatting){
             List<GameResult> list = new ArrayList<GameResult>();
@@ -235,7 +291,7 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
 
             shareString.append("(");
             for(BattingResult battingResult : targetGameResult.getBattingResultList()) {
-                shareString.append(battingResult.getBattingResultShortString());
+                shareString.append(battingResult.getBattingResultShortString(false));
                 shareString.append("、");
             }
             shareString.deleteCharAt(shareString.lastIndexOf("、"));
@@ -243,7 +299,17 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
         }
 
         if(hasPitching) {
-            // TODO
+            if(hasBatting) {
+                shareString.append("、");
+            }
+
+            shareString.append("投手成績は "+targetGameResult.getInningString()+" "
+                    +targetGameResult.getShitten()+"失点 自責点"+targetGameResult.getJisekiten()+" "
+                    +targetGameResult.getSekininString(false));
+
+            if(targetGameResult.getSekinin() != 0){
+                shareString.append(" ");
+            }
         }
 
         if(hasBatting || hasPitching) {
@@ -273,6 +339,10 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
             public void onClick(DialogInterface dialog, int which) {
                 GameResultManager.removeGameResult(ShowGameResultActivity.this, targetGameResult.getResultId());
                 ConfigManager.saveUpdateGameResultFlg(ShowGameResultActivity.this, ConfigManager.VIEW_GAME_RESULT_LIST, true);
+
+                // インタースティシャル広告（動画）を表示
+                showVideoAds();
+
                 finish();
             }
         });

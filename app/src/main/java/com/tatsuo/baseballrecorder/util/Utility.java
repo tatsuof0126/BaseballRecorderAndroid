@@ -3,9 +3,7 @@ package com.tatsuo.baseballrecorder.util;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.util.DisplayMetrics;
 import android.view.View;
-import android.widget.ScrollView;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,7 +23,7 @@ public class Utility {
     }
 
     public static String getFloatString3(float floatValue){
-        if(Float.isNaN(floatValue)){
+        if(Float.isNaN(floatValue) || Float.isInfinite(floatValue)){
             return ".---";
         }
 
@@ -35,6 +33,16 @@ public class Utility {
         if(floatValue < 1.0f){
             retString = retString.substring(1);
         }
+
+        return retString;
+    }
+
+    public static String getFloatString2(float floatValue){
+        if(Float.isNaN(floatValue) || Float.isInfinite(floatValue)){
+            return "-.--";
+        }
+
+        String retString = String.format("%.2f",floatValue);
 
         return retString;
     }

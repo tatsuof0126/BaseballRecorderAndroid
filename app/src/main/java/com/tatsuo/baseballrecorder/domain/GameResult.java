@@ -1,5 +1,6 @@
 package com.tatsuo.baseballrecorder.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -7,7 +8,7 @@ import java.util.UUID;
 /**
  * Created by tatsuo on 2015/08/12.
  */
-public class GameResult {
+public class GameResult implements Serializable {
 
     private String uuid;
     private int resultId;
@@ -23,10 +24,32 @@ public class GameResult {
     private int tokuten;
     private int steal;
     private String memo;
-
     private List<BattingResult> battingResultList;
 
+    private int inning;
+    private int inning2;
+    private int hianda;
+    private int hihomerun;
+    private int dassanshin;
+    private int yoshikyu;
+    private int yoshikyu2;
+    private int shitten;
+    private int jisekiten;
+    private boolean kanto;
+    private int tamakazu;
+    private int sekinin;
+
     public static final int NON_REGISTED = -999;
+    public static final int TAMAKAZU_NONE = -999;
+
+    public static final String[] INNING = {"","1回","2回","3回","4回","5回","6回","7回","8回","9回","10回","11回","12回"};
+    public static final String[] INNING2 = {"","0/3","1/3","2/3"};
+    public static final String[] INNING_PICKER = {"0回","1回","2回","3回","4回","5回","6回","7回","8回","9回","10回","11回","12回"};
+    public static final String[] INNING2_PICKER = {"","0/3","1/3","2/3"};
+
+    public static final String[] SEKININ = {"","勝利投手","敗戦投手","ホールド","セーブ"};
+    public static final String[] SEKININ_PICKER = {"なし","勝利投手","敗戦投手","ホールド","セーブ"};
+    public static final String[] SEKININ_COLOR = {"","#FF4444","","#4444FF","#4444FF"};
 
     public GameResult(){
         uuid = "";
@@ -44,6 +67,19 @@ public class GameResult {
         steal = 0;
         memo = "";
         battingResultList = new ArrayList();
+
+        inning = 0;
+        inning2 = 0;
+        hianda = 0;
+        hihomerun = 0;
+        dassanshin = 0;
+        yoshikyu = 0;
+        yoshikyu2 = 0;
+        shitten = 0;
+        jisekiten = 0;
+        kanto = false;
+        tamakazu = TAMAKAZU_NONE;
+        sekinin = 0;
     }
 
     public String getUuid() {
@@ -166,6 +202,102 @@ public class GameResult {
         this.battingResultList = battingResultList;
     }
 
+    public int getInning() {
+        return inning;
+    }
+
+    public void setInning(int inning) {
+        this.inning = inning;
+    }
+
+    public int getInning2() {
+        return inning2;
+    }
+
+    public void setInning2(int inning2) {
+        this.inning2 = inning2;
+    }
+
+    public int getHianda() {
+        return hianda;
+    }
+
+    public void setHianda(int hianda) {
+        this.hianda = hianda;
+    }
+
+    public int getHihomerun() {
+        return hihomerun;
+    }
+
+    public void setHihomerun(int hihomerun) {
+        this.hihomerun = hihomerun;
+    }
+
+    public int getDassanshin() {
+        return dassanshin;
+    }
+
+    public void setDassanshin(int dassanshin) {
+        this.dassanshin = dassanshin;
+    }
+
+    public int getYoshikyu() {
+        return yoshikyu;
+    }
+
+    public void setYoshikyu(int yoshikyu) {
+        this.yoshikyu = yoshikyu;
+    }
+
+    public int getYoshikyu2() {
+        return yoshikyu2;
+    }
+
+    public void setYoshikyu2(int yoshikyu2) {
+        this.yoshikyu2 = yoshikyu2;
+    }
+
+    public int getShitten() {
+        return shitten;
+    }
+
+    public void setShitten(int shitten) {
+        this.shitten = shitten;
+    }
+
+    public int getJisekiten() {
+        return jisekiten;
+    }
+
+    public void setJisekiten(int jisekiten) {
+        this.jisekiten = jisekiten;
+    }
+
+    public boolean isKanto() {
+        return kanto;
+    }
+
+    public void setKanto(boolean kanto) {
+        this.kanto = kanto;
+    }
+
+    public int getSekinin() {
+        return sekinin;
+    }
+
+    public void setSekinin(int sekinin) {
+        this.sekinin = sekinin;
+    }
+
+    public int getTamakazu() {
+        return tamakazu;
+    }
+
+    public void setTamakazu(int tamakazu) {
+        this.tamakazu = tamakazu;
+    }
+
     public String getGameResultString(){
         StringBuilder resultString = new StringBuilder();
 
@@ -194,7 +326,8 @@ public class GameResult {
         resultString.append("\n");
 
         // ５行目：投手成績（投球回、投球回小数点以下、安打、本塁打、奪三振、与四球、与死球、失点、自責点、完投、責任投手、投球数）
-        resultString.append("\n"); // 今のところ空
+        resultString.append(inning+","+inning2+","+hianda+","+hihomerun+","+dassanshin+","+yoshikyu+","+yoshikyu2+","
+                +shitten+","+jisekiten+","+( kanto ? 1 : 0 )+","+sekinin+","+tamakazu+"\n");
 
         // ６行目以降：メモ
         resultString.append(memo);
@@ -241,7 +374,21 @@ public class GameResult {
         gameResult.setBattingResultList(battingResultList);
 
         // ５行目：投手成績（投球回、投球回小数点以下、安打、本塁打、奪三振、与四球、与死球、失点、自責点、完投、責任投手、投球数）
-        // とりあえずスルー
+        String[] stringList5 = stringList[4].split(",", -1);
+        if(stringList5.length >= 12) {
+            gameResult.setInning(Integer.parseInt(stringList5[0]));
+            gameResult.setInning2(Integer.parseInt(stringList5[1]));
+            gameResult.setHianda(Integer.parseInt(stringList5[2]));
+            gameResult.setHihomerun(Integer.parseInt(stringList5[3]));
+            gameResult.setDassanshin(Integer.parseInt(stringList5[4]));
+            gameResult.setYoshikyu(Integer.parseInt(stringList5[5]));
+            gameResult.setYoshikyu2(Integer.parseInt(stringList5[6]));
+            gameResult.setShitten(Integer.parseInt(stringList5[7]));
+            gameResult.setJisekiten(Integer.parseInt(stringList5[8]));
+            gameResult.setKanto(Integer.parseInt(stringList5[9]) == 1);
+            gameResult.setSekinin(Integer.parseInt(stringList5[10]));
+            gameResult.setTamakazu(Integer.parseInt(stringList5[11]));
+        }
 
         // ６行目以降：メモ
         StringBuilder stringBuilder = new StringBuilder();
@@ -278,11 +425,51 @@ public class GameResult {
     public String getSubTitleString(){
         StringBuilder stringBuilder = new StringBuilder();
         for(BattingResult battingResult : battingResultList){
-            stringBuilder.append(battingResult.getBattingResultShortString());
+            stringBuilder.append(battingResult.getBattingResultShortString(true));
             stringBuilder.append(" ");
+        }
+
+        if(inning != 0 || inning2 != 0){
+            if(battingResultList.size() > 0){
+                stringBuilder.append("/ ");
+            }
+            stringBuilder.append(getInningString());
+            stringBuilder.append(" ");
+            stringBuilder.append((shitten == 0 ? "無" : shitten)+"失点");
+            stringBuilder.append(" ");
+            stringBuilder.append(getSekininString(true));
         }
 
         return stringBuilder.toString();
     }
 
+    public String getInningString(){
+        return getInningString(inning, inning2);
+    }
+
+    public static String getInningString(int inning, int inning2){
+        if(inning == 0 && inning2 == 0){
+            return "";
+        } else if(inning == 0){
+            return INNING2[inning2]+"回";
+        } else {
+            return INNING[inning]+INNING2[inning2];
+        }
+    }
+
+    public String getSekininString(boolean withColor){
+        return getSekininString(sekinin, withColor);
+    }
+
+    public static String getSekininString(int sekinin, boolean withColor){
+        String resultString = SEKININ[sekinin];
+
+        if(withColor && SEKININ_COLOR[sekinin].equals("") == false){
+            String beforeTag = "<font color=\""+SEKININ_COLOR[sekinin]+"\">";
+            String afterTag = "</font>";
+            return beforeTag+resultString+afterTag;
+        } else {
+            return resultString;
+        }
+    }
 }

@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,11 +34,16 @@ public class BattingAnalysisActivity extends CommonStatisticsActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_batting_analysis);
 
+        /*
         Button changeButton = (Button)findViewById(R.id.change_button);
         changeButton.setOnClickListener(this);
 
         Button shareButton = (Button)findViewById(R.id.share_button);
         shareButton.setOnClickListener(this);
+        */
+
+        ((Button)findViewById(R.id.change_button)).setOnClickListener(this);
+        ((Button)findViewById(R.id.share_button)).setOnClickListener(this);
 
         makeStatView();
 

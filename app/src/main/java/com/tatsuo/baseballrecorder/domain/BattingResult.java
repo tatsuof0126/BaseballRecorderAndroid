@@ -1,9 +1,11 @@
 package com.tatsuo.baseballrecorder.domain;
 
+import java.io.Serializable;
+
 /**
  * Created by tatsuo on 2015/08/12.
  */
-public class BattingResult {
+public class BattingResult implements Serializable {
 
     public static final String[] POSITIONS = {"","ピッチャー","キャッチャー","ファースト","セカンド","サード","ショート","レフト","センター","ライト","左中間","右中間","レフト線","ライト線"};
     public static final String[] POSITIONS_SHORT = {"","投","捕","一","二","三","遊","左","中","右","左中","右中","左線","右線"};
@@ -12,6 +14,11 @@ public class BattingResult {
     public static final String[] RESULTS = {"","ゴロ","フライ","ファールフライ","ライナー","エラー","フィルダースチョイス","ヒット","二塁打","三塁打","ホームラン","犠打","三振","振り逃げ","四球","死球","打撃妨害"};
     public static final String[] RESULTS_SHORT = {"","ゴ","飛","邪飛","直","失","野選","安","二","三","本","犠","三振","振逃","四球","死球","打妨"};
     public static final String[] RESULTS_PICKER = {"ゴロ","フライ","ファールフライ","ライナー","エラー","フィルダースチョイス","ヒット","二塁打","三塁打","ホームラン","犠打","三振","振り逃げ","四球","死球","打撃妨害"};
+    public static final String[] RESULTS_COLOR = {"","","","","","","","#FF4444","#FF4444","#FF4444","#FF4444","#4444FF","","","#4444FF","#4444FF",""};
+
+    public static final String[] PICKER1 = {"三振","四球","死球","ピッチャー","キャッチャー","ファースト","セカンド","サード","ショート","レフト","センター","ライト","左中間","右中間","レフト線","ライト線","振り逃げ","打撃妨害"};
+    public static final String[] PICKER2 = {"ゴロ","フライ","ファールフライ","ライナー","エラー","フィルダースチョイス","ヒット","二塁打","三塁打","ホームラン","犠打"};
+    public static final boolean[] NEEDS_POSITION = {false,false,false,true,true,true,true,true,true,true,true,true,true,true,true,true,false,false};
 
     public static final boolean[] NEED_POSITION = {false,true,true,true,true,true,true,true,true,true,true,true,false,false,false,false,true};
 
@@ -74,19 +81,36 @@ public class BattingResult {
         this.result = result;
     }
 
-    public String getBattingResultString(){
+    public String getBattingResultString(boolean withColor){
+        String resultString = "";
         if(position == NON_REGISTED){
-            return RESULTS[result];
+            resultString = RESULTS[result];
         } else {
-            return POSITIONS[position]+RESULTS[result];
+            resultString = POSITIONS[position]+RESULTS[result];
+        }
+        if(withColor && RESULTS_COLOR[result].equals("") == false){
+            String beforeTag = "<font color=\""+RESULTS_COLOR[result]+"\">";
+            String afterTag = "</font>";
+            return beforeTag+resultString+afterTag;
+        } else {
+            return resultString;
         }
     }
 
-    public String getBattingResultShortString(){
+    public String getBattingResultShortString(boolean withColor){
+        String resultString = "";
         if(position == NON_REGISTED){
-            return RESULTS_SHORT[result];
+            resultString = RESULTS_SHORT[result];
         } else {
-            return POSITIONS_SHORT[position]+RESULTS_SHORT[result];
+            resultString = POSITIONS_SHORT[position]+RESULTS_SHORT[result];
+        }
+
+        if(withColor && RESULTS_COLOR[result].equals("") == false){
+            String beforeTag = "<font color=\""+RESULTS_COLOR[result]+"\">";
+            String afterTag = "</font>";
+            return beforeTag+resultString+afterTag;
+        } else {
+            return resultString;
         }
     }
 

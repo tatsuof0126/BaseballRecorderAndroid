@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,11 +41,9 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
 
         setContentView(R.layout.activity_game_result_list);
 
-        Button toBattingStatButton = (Button)findViewById(R.id.to_batting_stat);
-        toBattingStatButton.setOnClickListener(this);
-
-        Button toBattingAnaButton = (Button)findViewById(R.id.to_batting_ana);
-        toBattingAnaButton.setOnClickListener(this);
+        ((Button)findViewById(R.id.to_batting_stat)).setOnClickListener(this);
+        ((Button)findViewById(R.id.to_batting_ana)).setOnClickListener(this);
+        ((Button)findViewById(R.id.to_pitching_stat)).setOnClickListener(this);
 
         makeListView();
         ConfigManager.saveUpdateGameResultFlg(this, ConfigManager.VIEW_GAME_RESULT_LIST, false);
@@ -173,6 +171,9 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
             case R.id.to_batting_ana:
                 moveBattingAnalysisActivity();
                 break;
+            case R.id.to_pitching_stat:
+                movePitchingStatisticsActivity();
+                break;
         }
     }
 
@@ -188,6 +189,11 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
 
     private void moveBattingAnalysisActivity(){
         Intent intent = new Intent(this, BattingAnalysisActivity.class);
+        startActivity(intent);
+    }
+
+    private void movePitchingStatisticsActivity(){
+        Intent intent = new Intent(this, PitchingStatisticsActivity.class);
         startActivity(intent);
     }
 
@@ -226,7 +232,7 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
             GameResult gameResult = gameResultList.get(position);
 
             titleView.setText(gameResult.getTitleString());
-            subtitleView.setText(gameResult.getSubTitleString());
+            subtitleView.setText(Html.fromHtml(gameResult.getSubTitleString()));
 
             // リスト項目のタップを横幅全体にきかせるようにするためTextViewの横幅を広げる
             DisplayMetrics dm = Resources.getSystem().getDisplayMetrics();

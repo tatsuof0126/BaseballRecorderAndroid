@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.tatsuo.baseballrecorder.BattingStatisticsActivity">
+    tools:context="com.tatsuo.baseballrecorder.PitchingStatisticsActivity">
 
     <LinearLayout
         android:orientation="vertical"
@@ -88,36 +88,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="【試合成績】 "
-                        android:id="@+id/textView22"
-                        android:paddingTop="10dp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingLeft="20dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Medium Text"
-                        android:id="@+id/game" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" >
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="【打撃成績】 "
+                        android:text="【投手成績】 "
                         android:id="@+id/textView24" />
 
                     <Button
@@ -149,8 +120,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Medium Text"
-                        android:id="@+id/batting" />
+                        android:text="99勝99敗99セーブ99ホールド"
+                        android:id="@+id/pitching_result" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -164,7 +135,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="二塁打"
+                        android:text="防御率"
                         android:id="@+id/textView26"
                         android:layout_weight="0.2" />
 
@@ -172,44 +143,26 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="0"
-                        android:id="@+id/doubles"
-                        android:layout_weight="0.15"
-                        android:gravity="center_horizontal" />
+                        android:text="--.--"
+                        android:id="@+id/era"
+                        android:layout_weight="0.2" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="三塁打"
+                        android:text="勝率"
                         android:id="@+id/textView28"
-                        android:layout_weight="0.2" />
+                        android:layout_weight="0.16" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="0"
-                        android:id="@+id/triples"
-                        android:layout_weight="0.15"
-                        android:gravity="center_horizontal" />
+                        android:text="-.---"
+                        android:id="@+id/shoritsu"
+                        android:layout_weight="0.44" />
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="本塁打"
-                        android:id="@+id/textView30"
-                        android:layout_weight="0.2" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="0"
-                        android:id="@+id/homeruns"
-                        android:layout_weight="0.15"
-                        android:gravity="center_horizontal" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -222,16 +175,45 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="三振"
+                        android:text="投球回"
                         android:id="@+id/textView32"
+                        android:layout_weight="0.21" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="999回2/3"
+                        android:id="@+id/inningstr"
+                        android:layout_weight="0.39" />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="20px"
+                        android:layout_weight="0.4" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="20dp" >
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="被安打"
+                        android:id="@+id/textView44"
                         android:layout_weight="0.2" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="0"
-                        android:id="@+id/strikeouts"
+                        android:text="999"
+                        android:id="@+id/hianda"
                         android:layout_weight="0.15"
                         android:gravity="center_horizontal" />
 
@@ -239,16 +221,45 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="四死球"
-                        android:id="@+id/textView34"
+                        android:text="被本塁打"
+                        android:id="@+id/textView46"
+                        android:layout_weight="0.28" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="999"
+                        android:id="@+id/hihomerun"
+                        android:layout_weight="0.2" />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="20px"
+                        android:layout_weight="0.22" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="20dp" >
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="奪三振"
+                        android:id="@+id/textView33"
                         android:layout_weight="0.2" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="0"
-                        android:id="@+id/walks"
+                        android:text="999"
+                        android:id="@+id/dassanshin"
                         android:layout_weight="0.15"
                         android:gravity="center_horizontal" />
 
@@ -256,16 +267,33 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="犠打"
-                        android:id="@+id/textView36"
+                        android:text="与四球"
+                        android:id="@+id/textView37"
                         android:layout_weight="0.2" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="0"
-                        android:id="@+id/sacrifices"
+                        android:text="999"
+                        android:id="@+id/yoshikyu"
+                        android:layout_weight="0.15"
+                        android:gravity="center_horizontal" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="与死球"
+                        android:id="@+id/textView41"
+                        android:layout_weight="0.2" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="999"
+                        android:id="@+id/yoshikyu2"
                         android:layout_weight="0.15"
                         android:gravity="center_horizontal" />
                 </LinearLayout>
@@ -280,7 +308,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="打点"
+                        android:text="失点"
                         android:id="@+id/textView38"
                         android:layout_weight="0.2" />
 
@@ -288,8 +316,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="0"
-                        android:id="@+id/daten"
+                        android:text="999"
+                        android:id="@+id/shitten"
                         android:gravity="center_horizontal"
                         android:layout_weight="0.15" />
 
@@ -297,7 +325,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="得点"
+                        android:text="自責点"
                         android:id="@+id/textView40"
                         android:layout_weight="0.2" />
 
@@ -305,8 +333,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="0"
-                        android:id="@+id/tokuten"
+                        android:text="999"
+                        android:id="@+id/jisekiten"
                         android:gravity="center_horizontal"
                         android:layout_weight="0.15" />
 
@@ -314,7 +342,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="盗塁"
+                        android:text="完投"
                         android:id="@+id/textView42"
                         android:layout_weight="0.2" />
 
@@ -322,8 +350,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="0"
-                        android:id="@+id/steal"
+                        android:text="999"
+                        android:id="@+id/kanto"
                         android:gravity="center_horizontal"
                         android:layout_weight="0.15" />
                 </LinearLayout>
@@ -332,42 +360,78 @@
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingLeft="15dp">
+                    android:paddingLeft="20dp">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Medium Text"
-                        android:id="@+id/stats1" />
+                        android:text="WHIP"
+                        android:id="@+id/textView54"
+                        android:layout_weight="0.2" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="-.--"
+                        android:id="@+id/whip"
+                        android:layout_weight="0.2" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="奪三振率"
+                        android:id="@+id/textView55"
+                        android:layout_weight="0.3" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="-.--"
+                        android:id="@+id/k9"
+                        android:layout_weight="0.3" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingLeft="15dp">
+                    android:paddingLeft="20dp">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Medium Text"
-                        android:id="@+id/stats2" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingLeft="15dp" >
+                        android:text="K/BB"
+                        android:id="@+id/textView53"
+                        android:layout_weight="0.2" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Medium Text"
-                        android:id="@+id/stats3" />
+                        android:text="-.--"
+                        android:id="@+id/kbb"
+                        android:layout_weight="0.2" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="FIP"
+                        android:id="@+id/textView57"
+                        android:layout_weight="0.16" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="-.--"
+                        android:id="@+id/fip"
+                        android:layout_weight="0.44" />
                 </LinearLayout>
 
                 <LinearLayout
