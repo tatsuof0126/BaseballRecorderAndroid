@@ -32,7 +32,7 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
         super.onCreate(savedInstanceState);
 
         // GoogleAnalytics初期化
-        ((AnalyticsApplication)getApplication()).getTracker();
+        ((BaseballRecorderApplication)getApplication()).getTracker();
 
         // テストデータ作成用
         if(ConfigManager.makeTestData){
@@ -44,11 +44,15 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
         ((Button)findViewById(R.id.to_batting_stat)).setOnClickListener(this);
         ((Button)findViewById(R.id.to_batting_ana)).setOnClickListener(this);
         ((Button)findViewById(R.id.to_pitching_stat)).setOnClickListener(this);
+        ((Button)findViewById(R.id.to_config)).setOnClickListener(this);
 
         makeListView();
-        ConfigManager.saveUpdateGameResultFlg(this, ConfigManager.VIEW_GAME_RESULT_LIST, false);
+        ConfigManager.saveUpdateGameResultFlg(ConfigManager.VIEW_GAME_RESULT_LIST, false);
 
         makeAdsView();
+
+        // インタースティシャル広告（動画）を準備
+        prepareInterstitial();
     }
 
     @Override
@@ -70,11 +74,15 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
         super.onResume();
 
         // データが更新されていれば表示を更新する
-        if(ConfigManager.loadUpdateGameResultFlg(this, ConfigManager.VIEW_GAME_RESULT_LIST)) {
+        if(ConfigManager.loadUpdateGameResultFlg(ConfigManager.VIEW_GAME_RESULT_LIST)) {
             updateListView();
-            ConfigManager.saveUpdateGameResultFlg(this, ConfigManager.VIEW_GAME_RESULT_LIST, false);
+            ConfigManager.saveUpdateGameResultFlg(ConfigManager.VIEW_GAME_RESULT_LIST, false);
         }
 
+        // インタースティシャル広告（動画）を表示
+        if(showInterstitial){
+            showInterstitial();
+        }
     }
 
     @Override
@@ -174,6 +182,9 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
             case R.id.to_pitching_stat:
                 movePitchingStatisticsActivity();
                 break;
+            case R.id.to_config:
+                moveConfigActivity();
+                break;
         }
     }
 
@@ -194,6 +205,11 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
 
     private void movePitchingStatisticsActivity(){
         Intent intent = new Intent(this, PitchingStatisticsActivity.class);
+        startActivity(intent);
+    }
+
+    private void moveConfigActivity(){
+        Intent intent = new Intent(this, ConfigActivity.class);
         startActivity(intent);
     }
 

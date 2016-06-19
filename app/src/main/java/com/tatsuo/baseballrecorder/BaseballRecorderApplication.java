@@ -8,12 +8,15 @@ import com.google.android.gms.analytics.Tracker;
 /**
  * Created by tatsuo on 2015/08/30.
  */
-public class AnalyticsApplication extends Application {
+public class BaseballRecorderApplication extends Application {
 
     private Tracker mTracker;
 
-    public AnalyticsApplication(){
+    private static BaseballRecorderApplication instance;
+
+    public BaseballRecorderApplication() {
         super();
+        instance = this;
     }
 
     public synchronized Tracker getTracker() {
@@ -22,6 +25,10 @@ public class AnalyticsApplication extends Application {
             mTracker = analytics.newTracker(R.xml.app_tracker);
         }
         return mTracker;
+    }
+
+    public static BaseballRecorderApplication getInstance() {
+        return instance;
     }
 
 }

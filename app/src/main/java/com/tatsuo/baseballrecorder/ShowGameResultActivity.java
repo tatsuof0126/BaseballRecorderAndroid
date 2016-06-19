@@ -52,10 +52,11 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
         }
 
         updateResultView();
-        ConfigManager.saveUpdateGameResultFlg(this, ConfigManager.VIEW_SHOW_GAME_RESULT, false);
+        ConfigManager.saveUpdateGameResultFlg(ConfigManager.VIEW_SHOW_GAME_RESULT, false);
 
         // インタースティシャル広告（動画）を準備
-        prepareVideoAds();
+        // prepareVideoAds();
+        prepareInterstitial();
 
         makeAdsView();
     }
@@ -65,12 +66,16 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
         super.onResume();
 
         // データが更新されていれば表示を更新する
-        if(ConfigManager.loadUpdateGameResultFlg(this, ConfigManager.VIEW_SHOW_GAME_RESULT)) {
+        if(ConfigManager.loadUpdateGameResultFlg(ConfigManager.VIEW_SHOW_GAME_RESULT)) {
             targetGameResult = GameResultManager.loadGameResult(this, targetGameResult.getResultId());
             updateResultView();
-            ConfigManager.saveUpdateGameResultFlg(this, ConfigManager.VIEW_SHOW_GAME_RESULT, false);
+            ConfigManager.saveUpdateGameResultFlg(ConfigManager.VIEW_SHOW_GAME_RESULT, false);
         }
 
+        // インタースティシャル広告（動画）を表示
+        if(showInterstitial){
+            showInterstitial();
+        }
     }
 
     @Override
@@ -325,7 +330,7 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
         intent.putExtra(Intent.EXTRA_TEXT, shareString.toString());
         startActivity(intent);
 
-        Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
+        Tracker tracker = ((BaseballRecorderApplication)getApplication()).getTracker();
         tracker.send(new HitBuilders.EventBuilder()
                 .setCategory("Button").setAction("Push").setLabel("試合結果参照画面―シェア").build());
 
@@ -338,10 +343,11 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 GameResultManager.removeGameResult(ShowGameResultActivity.this, targetGameResult.getResultId());
-                ConfigManager.saveUpdateGameResultFlg(ShowGameResultActivity.this, ConfigManager.VIEW_GAME_RESULT_LIST, true);
+                ConfigManager.saveUpdateGameResultFlg(ConfigManager.VIEW_GAME_RESULT_LIST, true);
 
                 // インタースティシャル広告（動画）を表示
-                showVideoAds();
+                // showVideoAds();
+                showInterstitial = true;
 
                 finish();
             }

@@ -52,7 +52,7 @@ public class BattingAnalysisActivity extends CommonStatisticsActivity implements
 
     @Override
     protected void makeStatView(){
-        StatRange statRange = ConfigManager.loadStatRange(this);
+        StatRange statRange = ConfigManager.loadStatRange();
 
         TextView timeText = (TextView)findViewById(R.id.time);
         timeText.setText(statRange.getStatTimeString());
@@ -157,7 +157,7 @@ public class BattingAnalysisActivity extends CommonStatisticsActivity implements
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivity(intent);
 
-        Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
+        Tracker tracker = ((BaseballRecorderApplication)getApplication()).getTracker();
         tracker.send(new HitBuilders.EventBuilder()
                 .setCategory("Button").setAction("Push").setLabel("打撃分析画面―画像でシェア").build());
 

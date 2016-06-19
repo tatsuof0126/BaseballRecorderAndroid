@@ -1,8 +1,11 @@
 package com.tatsuo.baseballrecorder.domain;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
+import com.tatsuo.baseballrecorder.BaseballRecorderApplication;
 
 /**
  * Created by tatsuo on 2015/08/23.
@@ -17,8 +20,9 @@ public class ConfigManager {
     private static boolean showAds = true;
     public static boolean makeTestData = false;
 
-    public static StatRange loadStatRange(Activity activity) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+    public static StatRange loadStatRange() {
+        Context context = BaseballRecorderApplication.getInstance();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         String typeStr = sharedPreferences.getString("STAT_TIME_TYPE", Integer.toString(StatRange.TYPE_ALL));
         String yearStr = sharedPreferences.getString("STAT_TIME_YEAR", "");
@@ -31,8 +35,9 @@ public class ConfigManager {
         return statRange;
     }
 
-    public static void saveStatRange(Activity activity, StatRange statRange){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+    public static void saveStatRange(StatRange statRange){
+        Context context = BaseballRecorderApplication.getInstance();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         editor.putString("STAT_TIME_TYPE",Integer.toString(statRange.getType()));
@@ -43,13 +48,15 @@ public class ConfigManager {
         editor.commit();
     }
 
-    public static boolean loadUpdateGameResultFlg(Activity activity, int view){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+    public static boolean loadUpdateGameResultFlg(int view){
+        Context context = BaseballRecorderApplication.getInstance();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPreferences.getBoolean("UPDATE_GAME_RESULT_FLG_"+view, false);
     }
 
-    public static void saveUpdateGameResultFlg(Activity activity, int view, boolean updateFlg){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+    public static void saveUpdateGameResultFlg(int view, boolean updateFlg){
+        Context context = BaseballRecorderApplication.getInstance();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         if(view == VIEW_ALL){
@@ -60,6 +67,21 @@ public class ConfigManager {
             editor.putBoolean("UPDATE_GAME_RESULT_FLG_" + view, updateFlg);
         }
 
+        editor.commit();
+    }
+
+    public static boolean loadCalc7Flg(){
+        Context context = BaseballRecorderApplication.getInstance();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getBoolean("CALC7_FLG", false);
+    }
+
+    public static void saveCalc7Flg(boolean calc7Flg){
+        Context context = BaseballRecorderApplication.getInstance();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putBoolean("CALC7_FLG", calc7Flg);
         editor.commit();
     }
 

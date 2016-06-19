@@ -68,7 +68,7 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
 
     @Override
     protected void makeStatView(){
-        StatRange statRange = ConfigManager.loadStatRange(this);
+        StatRange statRange = ConfigManager.loadStatRange();
 
         TextView timeText = (TextView)findViewById(R.id.time);
         timeText.setText(statRange.getStatTimeString());
@@ -229,7 +229,7 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
         intent.putExtra(Intent.EXTRA_TEXT, shareString.toString());
         startActivity(intent);
 
-        Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
+        Tracker tracker = ((BaseballRecorderApplication)getApplication()).getTracker();
         tracker.send(new HitBuilders.EventBuilder()
                 .setCategory("Button").setAction("Push").setLabel("打撃成績画面―シェア").build());
 
@@ -284,14 +284,14 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivity(intent);
 
-        Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
+        Tracker tracker = ((BaseballRecorderApplication)getApplication()).getTracker();
         tracker.send(new HitBuilders.EventBuilder()
                 .setCategory("Button").setAction("Push").setLabel("打撃成績画面―画像でシェア").build());
 
     }
 
     private void addStatTitle(StringBuilder stringBuilder){
-        StatRange statRange = ConfigManager.loadStatRange(this);
+        StatRange statRange = ConfigManager.loadStatRange();
 
         switch (statRange.getType()){
             case StatRange.TYPE_ALL:

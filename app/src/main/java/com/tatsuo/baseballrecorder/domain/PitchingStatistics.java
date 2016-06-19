@@ -255,8 +255,11 @@ public class PitchingStatistics {
     private void calculateStatistics(){
         float realinning = (float)(inning*3 + inning2) / 3.0f;
 
-        // ９回固定（将来は７回での計算も）
+        // ９回or７回
         float gameinning = 9.0f;
+        if(ConfigManager.loadCalc7Flg() == true){
+            gameinning = 7.0f;
+        }
 
         // 勝率
         shoritsu = (float)win / (win + lose);

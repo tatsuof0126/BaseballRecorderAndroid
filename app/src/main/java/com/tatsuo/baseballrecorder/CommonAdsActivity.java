@@ -7,6 +7,8 @@ import android.widget.LinearLayout;
 import com.socdm.d.adgeneration.ADG;
 import com.socdm.d.adgeneration.ADGConsts;
 import com.socdm.d.adgeneration.ADGListener;
+import com.socdm.d.adgeneration.interstitial.ADGInterstitial;
+import com.socdm.d.adgeneration.interstitial.ADGInterstitialListener;
 import com.tatsuo.baseballrecorder.domain.ConfigManager;
 
 import jp.co.geniee.gnadsdk.video.GNAdVideo;
@@ -16,10 +18,15 @@ import jp.co.geniee.gnadsdk.video.GNAdVideo;
  */
 public class CommonAdsActivity extends AppCompatActivity implements GNAdVideo.GNAdVideoListener {
 
-    protected static ADG adg;
+    protected static ADG adg = null;
     protected static boolean isAds = false;
 
     protected GNAdVideo videoAd = null;
+
+    protected ADGInterstitial interstitial = null;
+    // protected static ADGInterstitial adgInterstitial = null;
+    // protected static boolean usedInterstitial = false;
+    protected static boolean showInterstitial = false;
 
     protected void makeAdsView(){
         if(ConfigManager.isShowAds(this) == false){
@@ -40,6 +47,57 @@ public class CommonAdsActivity extends AppCompatActivity implements GNAdVideo.GN
             adsLayout.addView(adg);
             adg.start();
         }
+    }
+
+    protected void prepareInterstitial() {
+        if(ConfigManager.isShowAds(this) == false){
+            return;
+        }
+
+        // Log.e("PrepareInterstitial", "PrepareInterstitial : "+getClass().getName());
+
+        /*
+        // 使用済みオブジェクトなら初期化
+        if(usedInterstitial){
+            usedInterstitial = false;
+            if(adgInterstitial != null) {
+                adgInterstitial.dismiss();
+                adgInterstitial = null;
+            }
+        }
+
+//        if (adgInterstitial == null) {
+            adgInterstitial = new ADGInterstitial(this);
+            adgInterstitial.setLocationId("38148");
+            // adgInterstitial.setSpan(25, true);
+            adgInterstitial.setSpan(100, true);
+            adgInterstitial.setAdListener(new InterstitialListener());
+            adgInterstitial.preload();
+//        }
+        */
+
+        interstitial = new ADGInterstitial(this);
+        interstitial.setLocationId("38148");
+        interstitial.setSpan(25, true);
+        interstitial.setAdListener(new InterstitialListener());
+        interstitial.preload();
+    }
+
+    protected void showInterstitial(){
+        if(ConfigManager.isShowAds(this) == false){
+            return;
+        }
+
+        // Log.e("ShowInterstitial", "ShowInterstitial : "+ showInterstitial + " " + getClass().getName());
+        if(showInterstitial == false || interstitial == null){
+            return;
+        }
+
+        // usedInterstitial = true;
+        showInterstitial = false;
+        boolean showAd = interstitial.show();
+//        boolean showAd = adgInterstitial.show();
+        // Log.e("ShowInterstitial","showAd result " + showAd);
     }
 
     protected void prepareVideoAds(){
@@ -111,10 +169,43 @@ public class CommonAdsActivity extends AppCompatActivity implements GNAdVideo.GN
         }
     }
 
+    class InterstitialListener extends ADGInterstitialListener {
+        @Override
+        public void onReceiveAd() {
+            // Log.e("ADG", "onReceiveAd");
+        }
+
+        @Override
+        public void onFailedToReceiveAd(ADGConsts.ADGErrorCode code) {
+            // Log.e("ADG", "onFailedToReceiveAd");
+            // 不通とエラー過多のとき以外はリトライ
+            switch (code) {
+                case EXCEED_LIMIT:
+                case NEED_CONNECTION:
+                    break;
+                default:
+                    interstitial.preload();
+                    break;
+            }
+        }
+
+        @Override
+        public void onCloseInterstitial() {
+            // Log.e("ADG", "onCloseInterstitial");
+        }
+
+        @Override
+        public void onOpenUrl() {
+            // Log.e("ADG", "onOpenUrl");
+            interstitial.dismiss();
+        }
+    }
+
     protected void adjustViewHeight() {
         // 必要時Override
     }
 
+    
     // インタースティシャル広告（動画）用の実装
     // 広告データの読み込みが完了した時に送られます。
     public void onGNAdVideoReceiveSetting() {

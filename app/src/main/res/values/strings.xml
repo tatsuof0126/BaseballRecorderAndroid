@@ -7,6 +7,7 @@
     <string name="title_activity_batting_statistics">打撃成績</string>
     <string name="title_activity_batting_analysis">打撃分析</string>
     <string name="title_activity_pitching_statistics">投手成績</string>
+    <string name="title_activity_config">設定</string>
 
     <string name="hello_world">hello_world</string>
     <string name="action_settings">hello_world</string>

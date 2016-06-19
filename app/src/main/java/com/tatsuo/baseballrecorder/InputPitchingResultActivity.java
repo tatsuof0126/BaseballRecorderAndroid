@@ -36,8 +36,9 @@ public class InputPitchingResultActivity extends CommonAdsActivity implements Vi
     private int inning2 = 0;
     private int sekinin = 0;
 
-    static final int RESULT_SAVED = 101;
-    static final int RESULT_TO_BATTING = 102;
+    static final int RESULT_SAVED_REGIST = 101;
+    static final int RESULT_SAVED_UPDATE = 102;
+    static final int RESULT_TO_BATTING = 103;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -300,22 +301,27 @@ public class InputPitchingResultActivity extends CommonAdsActivity implements Vi
         boolean registFlg = (targetGameResult.getResultId() == GameResult.NON_REGISTED);
 
         GameResultManager.saveGameResult(this, targetGameResult);
-        ConfigManager.saveUpdateGameResultFlg(this, ConfigManager.VIEW_ALL, true);
+        ConfigManager.saveUpdateGameResultFlg(ConfigManager.VIEW_ALL, true);
 
         if(registFlg){
-            Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
+            Tracker tracker = ((BaseballRecorderApplication)getApplication()).getTracker();
             tracker.send(new HitBuilders.EventBuilder()
                     .setCategory("Button").setAction("Push").setLabel("投手成績入力画面―登録").build());
             Toast.makeText(this, "登録しました", Toast.LENGTH_LONG).show();
         } else {
-            Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
+            Tracker tracker = ((BaseballRecorderApplication)getApplication()).getTracker();
             tracker.send(new HitBuilders.EventBuilder()
                     .setCategory("Button").setAction("Push").setLabel("投手成績入力画面―更新").build());
             Toast.makeText(this, "保存しました", Toast.LENGTH_LONG).show();
         }
 
         Intent intent = new Intent();
-        setResult(RESULT_SAVED, intent);
+        if(registFlg){
+            intent.putExtra("RESULTID", targetGameResult.getResultId());
+            setResult(RESULT_SAVED_REGIST, intent);
+        } else {
+            setResult(RESULT_SAVED_UPDATE, intent);
+        }
         finish();
     }
 

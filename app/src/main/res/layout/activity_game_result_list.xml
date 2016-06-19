@@ -50,7 +50,7 @@
                 android:id="@+id/to_batting_stat" />
 
             <Space
-                android:layout_width="15dp"
+                android:layout_width="0dp"
                 android:layout_height="match_parent" />
 
             <Button
@@ -60,7 +60,7 @@
                 android:id="@+id/to_batting_ana" />
 
             <Space
-                android:layout_width="15dp"
+                android:layout_width="0dp"
                 android:layout_height="match_parent" />
 
             <Button
@@ -68,6 +68,16 @@
                 android:layout_height="wrap_content"
                 android:text="投手成績"
                 android:id="@+id/to_pitching_stat" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="設定"
+                android:id="@+id/to_config" />
 
         </LinearLayout>
 

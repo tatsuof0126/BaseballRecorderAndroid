@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.DisplayMetrics;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -90,7 +91,8 @@ public class InputGameResultActivity extends CommonAdsActivity
         ((Button)findViewById(R.id.delete_button)).setOnClickListener(this);
 
         // インタースティシャル広告（動画）を準備
-        prepareVideoAds();
+        // prepareVideoAds();
+        // prepareInterstitial();
 
         makeAdsView();
     }
@@ -162,9 +164,22 @@ public class InputGameResultActivity extends CommonAdsActivity
             case InputPitchingResultActivity.RESULT_TO_BATTING:
                 targetGameResult = (GameResult)intent.getSerializableExtra("GAME_RESULT");
                 break;
-            case InputPitchingResultActivity.RESULT_SAVED:
+            case InputPitchingResultActivity.RESULT_SAVED_REGIST:
                 // インタースティシャル広告（動画）を表示
-                showVideoAds();
+                showInterstitial = true;
+
+                // 試合結果照会画面に遷移
+                int resultId = intent.getIntExtra("RESULTID", NO_TARGET);
+                Intent newIntent = new Intent(this, ShowGameResultActivity.class);
+                newIntent.putExtra("RESULTID", resultId);
+                startActivity(newIntent);
+
+                finish();
+                break;
+            case InputPitchingResultActivity.RESULT_SAVED_UPDATE:
+                // インタースティシャル広告（動画）を表示
+                showInterstitial = true;
+
                 finish();
                 break;
             case RESULT_CANCELED:
@@ -248,6 +263,25 @@ public class InputGameResultActivity extends CommonAdsActivity
     }
 
     @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("入力内容を保存せずに戻ります。\nよろしいですか？");
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+            builder.setNegativeButton("キャンセル", null);
+            builder.show();
+
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public void onFocusChange(View v, boolean hasFocus) {
         EditText myscoreText = (EditText)findViewById(R.id.myscore);
         EditText otherscoreText = (EditText)findViewById(R.id.otherscore);
@@ -302,22 +336,30 @@ public class InputGameResultActivity extends CommonAdsActivity
         boolean registFlg = (targetGameResult.getResultId() == GameResult.NON_REGISTED);
 
         GameResultManager.saveGameResult(this, targetGameResult);
-        ConfigManager.saveUpdateGameResultFlg(this, ConfigManager.VIEW_ALL, true);
+        ConfigManager.saveUpdateGameResultFlg(ConfigManager.VIEW_ALL, true);
 
         if(registFlg){
-            Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
+            Tracker tracker = ((BaseballRecorderApplication)getApplication()).getTracker();
             tracker.send(new HitBuilders.EventBuilder()
                     .setCategory("Button").setAction("Push").setLabel("打撃成績入力画面―登録").build());
             Toast.makeText(this, "登録しました", Toast.LENGTH_LONG).show();
         } else {
-            Tracker tracker = ((AnalyticsApplication)getApplication()).getTracker();
+            Tracker tracker = ((BaseballRecorderApplication)getApplication()).getTracker();
             tracker.send(new HitBuilders.EventBuilder()
                     .setCategory("Button").setAction("Push").setLabel("打撃成績入力画面―更新").build());
             Toast.makeText(this, "保存しました", Toast.LENGTH_LONG).show();
         }
 
         // インタースティシャル広告（動画）を表示
-        showVideoAds();
+        // showVideoAds();
+        showInterstitial = true;
+
+        // 試合結果照会画面に遷移
+        if(registFlg) {
+            Intent intent = new Intent(this, ShowGameResultActivity.class);
+            intent.putExtra("RESULTID", targetGameResult.getResultId());
+            startActivity(intent);
+        }
 
         finish();
     }

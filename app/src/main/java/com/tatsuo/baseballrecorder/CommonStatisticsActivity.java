@@ -2,7 +2,6 @@ package com.tatsuo.baseballrecorder;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.support.v7.app.AppCompatActivity;
 
 import com.tatsuo.baseballrecorder.domain.ConfigManager;
 import com.tatsuo.baseballrecorder.domain.GameResultManager;
@@ -62,7 +61,7 @@ public class CommonStatisticsActivity extends CommonAdsActivity {
                     selectedStatRange.setTeam(teamString[i]);
                 }
 
-                ConfigManager.saveStatRange(CommonStatisticsActivity.this, selectedStatRange);
+                ConfigManager.saveStatRange(selectedStatRange);
                 makeStatView();
             }
         });
