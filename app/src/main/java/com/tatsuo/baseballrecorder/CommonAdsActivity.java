@@ -11,25 +11,19 @@ import com.socdm.d.adgeneration.interstitial.ADGInterstitial;
 import com.socdm.d.adgeneration.interstitial.ADGInterstitialListener;
 import com.tatsuo.baseballrecorder.domain.ConfigManager;
 
-import jp.co.geniee.gnadsdk.video.GNAdVideo;
-
 /**
  * Created by tatsuo on 2015/08/26.
  */
-public class CommonAdsActivity extends AppCompatActivity implements GNAdVideo.GNAdVideoListener {
+public class CommonAdsActivity extends AppCompatActivity {
 
     protected static ADG adg = null;
     protected static boolean isAds = false;
 
-    protected GNAdVideo videoAd = null;
-
     protected ADGInterstitial interstitial = null;
-    // protected static ADGInterstitial adgInterstitial = null;
-    // protected static boolean usedInterstitial = false;
     protected static boolean showInterstitial = false;
 
     protected void makeAdsView(){
-        if(ConfigManager.isShowAds(this) == false){
+        if(ConfigManager.isShowAds() == false){
             return;
         }
 
@@ -50,41 +44,24 @@ public class CommonAdsActivity extends AppCompatActivity implements GNAdVideo.GN
     }
 
     protected void prepareInterstitial() {
-        if(ConfigManager.isShowAds(this) == false){
+        if(ConfigManager.isShowAds() == false){
             return;
         }
 
         // Log.e("PrepareInterstitial", "PrepareInterstitial : "+getClass().getName());
 
-        /*
-        // 使用済みオブジェクトなら初期化
-        if(usedInterstitial){
-            usedInterstitial = false;
-            if(adgInterstitial != null) {
-                adgInterstitial.dismiss();
-                adgInterstitial = null;
-            }
-        }
-
-//        if (adgInterstitial == null) {
-            adgInterstitial = new ADGInterstitial(this);
-            adgInterstitial.setLocationId("38148");
-            // adgInterstitial.setSpan(25, true);
-            adgInterstitial.setSpan(100, true);
-            adgInterstitial.setAdListener(new InterstitialListener());
-            adgInterstitial.preload();
-//        }
-        */
-
         interstitial = new ADGInterstitial(this);
         interstitial.setLocationId("38148");
+        // interstitial.setLocationId("26803"); // テストID
+        // interstitial.setEnableTestMode(true); // テストモード
+        // interstitial.setSpan(100, true);
         interstitial.setSpan(25, true);
         interstitial.setAdListener(new InterstitialListener());
         interstitial.preload();
     }
 
     protected void showInterstitial(){
-        if(ConfigManager.isShowAds(this) == false){
+        if(ConfigManager.isShowAds() == false){
             return;
         }
 
@@ -93,35 +70,9 @@ public class CommonAdsActivity extends AppCompatActivity implements GNAdVideo.GN
             return;
         }
 
-        // usedInterstitial = true;
         showInterstitial = false;
         boolean showAd = interstitial.show();
-//        boolean showAd = adgInterstitial.show();
         // Log.e("ShowInterstitial","showAd result " + showAd);
-    }
-
-    protected void prepareVideoAds(){
-        if(ConfigManager.isShowAds(this) == false){
-            return;
-        }
-
-        // インタースティシャル広告（動画）をロード、表示率は30％にする
-        videoAd = new GNAdVideo(this, 1070196);
-        videoAd.setAlternativeInterstitialAppID(1070000);
-        videoAd.setShowRate(30);
-        videoAd.setListener(this);
-        videoAd.load(this);
-    }
-
-    protected void showVideoAds(){
-        if(ConfigManager.isShowAds(this) == false){
-            return;
-        }
-
-        // インタースティシャル広告（動画）を表示
-        if (videoAd != null && videoAd.isReady()) {
-            videoAd.show(this);
-        }
     }
 
     @Override
@@ -159,7 +110,9 @@ public class CommonAdsActivity extends AppCompatActivity implements GNAdVideo.GN
                 case NEED_CONNECTION:
                     break;
                 default:
-                    adg.start();
+                    if(adg != null) {
+                        adg.start();
+                    }
                     break;
             }
         }
@@ -184,7 +137,9 @@ public class CommonAdsActivity extends AppCompatActivity implements GNAdVideo.GN
                 case NEED_CONNECTION:
                     break;
                 default:
-                    interstitial.preload();
+                    if(interstitial != null) {
+                        interstitial.preload();
+                    }
                     break;
             }
         }
@@ -203,23 +158,6 @@ public class CommonAdsActivity extends AppCompatActivity implements GNAdVideo.GN
 
     protected void adjustViewHeight() {
         // 必要時Override
-    }
-
-    
-    // インタースティシャル広告（動画）用の実装
-    // 広告データの読み込みが完了した時に送られます。
-    public void onGNAdVideoReceiveSetting() {
-    }
-    // ネットワークエラー等の原因で広告の読み込みに失敗した時に送られます。
-    public void onGNAdVideoFailedToReceiveSetting() {
-    }
-    // 動画広告画面が閉じられる直後に送られます。
-    public void onGNAdVideoClose() {
-    }
-    // 管理画面より、代替インタースティシャル広告画面に設置したボタンがタップされ、
-    // インタースティシャル広告画面が閉じられる直後に送られます。
-    // タップされたボタンの番号は、`nButtonIndex`パラメータで通知されます。
-    public void onGNAdVideoButtonClick(int nButtonIndex) {
     }
 
 }

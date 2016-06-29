@@ -1,6 +1,5 @@
 package com.tatsuo.baseballrecorder.domain;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -17,7 +16,7 @@ public class ConfigManager {
     public static final int VIEW_SHOW_GAME_RESULT = 2;
     public static final int[] VIEW_LIST = {VIEW_GAME_RESULT_LIST, VIEW_SHOW_GAME_RESULT};
 
-    private static boolean showAds = true;
+    // private static boolean showAds = true;
     public static boolean makeTestData = false;
 
     public static StatRange loadStatRange() {
@@ -85,9 +84,20 @@ public class ConfigManager {
         editor.commit();
     }
 
-    public static boolean isShowAds(Activity activity){
-        // TODO 広告削除機能
-        return showAds;
+    public static boolean isShowAds(){
+        Context context = BaseballRecorderApplication.getInstance();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getBoolean("SHOW_ADS", true);
+    }
+
+    public static void saveShowAds(boolean showAds){
+        Context context = BaseballRecorderApplication.getInstance();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putBoolean("SHOW_ADS", showAds);
+        editor.commit();
     }
 
 }

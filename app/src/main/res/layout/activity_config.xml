@@ -47,8 +47,14 @@
                         style="?android:attr/buttonStyleSmall"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=" 削除 "
-                        android:id="@+id/delete_button" />
+                        android:text="広告を削除"
+                        android:id="@+id/remove_ads_button" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="広告を削除済"
+                        android:id="@+id/removed_ads" />
                 </LinearLayout>
 
                 <LinearLayout

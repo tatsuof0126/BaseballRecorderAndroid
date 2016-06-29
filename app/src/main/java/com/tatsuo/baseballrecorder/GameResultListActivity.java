@@ -73,6 +73,8 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
     protected void onResume(){
         super.onResume();
 
+        adjustViewHeight();
+
         // データが更新されていれば表示を更新する
         if(ConfigManager.loadUpdateGameResultFlg(ConfigManager.VIEW_GAME_RESULT_LIST)) {
             updateListView();
@@ -109,7 +111,7 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
     }
 
     private void makeListView(){
-        adjustViewHeight();
+        // adjustViewHeight(); onResumeで呼ばれるから削除
 
         updateListView();
 
@@ -159,7 +161,7 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
         int footer = 50; //dp
         int footerpx = (int)(footer * density + 0.5f);
 
-        int ads = isAds ? 50 : 0; //dp
+        int ads = isAds && ConfigManager.isShowAds() ? 50 : 0; //dp
         int adspx = (int)(ads * density + 0.5f);
 
         int listViewHeight = height - (headerpx + footerpx + adspx);

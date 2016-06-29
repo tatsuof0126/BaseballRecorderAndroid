@@ -1,5 +1,7 @@
 package com.tatsuo.baseballrecorder.util;
 
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -85,6 +87,13 @@ public class Utility {
         view.setDrawingCacheEnabled(false);
 
         return screenShot;
+    }
+
+    public static void showAlertDialog(Context context, String message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(message);
+        builder.setPositiveButton("OK", null);
+        builder.show();
     }
 
 }
