@@ -4,11 +4,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.socdm.d.adgeneration.ADG;
-import com.socdm.d.adgeneration.ADGConsts;
-import com.socdm.d.adgeneration.ADGListener;
-import com.socdm.d.adgeneration.interstitial.ADGInterstitial;
-import com.socdm.d.adgeneration.interstitial.ADGInterstitialListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.tatsuo.baseballrecorder.domain.ConfigManager;
 
 /**
@@ -16,10 +15,18 @@ import com.tatsuo.baseballrecorder.domain.ConfigManager;
  */
 public class CommonAdsActivity extends AppCompatActivity {
 
-    protected static ADG adg = null;
+    // protected static ADG adg = null;
+    protected AdView gadView = null;
     protected static boolean isAds = false;
 
-    protected ADGInterstitial interstitial = null;
+    public static final String GAD_APP_ID = "ca-app-pub-6719193336347757~3537491855";
+    public static final String GAD_UNIT_ID = "ca-app-pub-6719193336347757/5014225053";
+    public static final String GAD_INT_UNIT_ID = "ca-app-pub-6719193336347757/6490958256";
+
+    private static final int INTERSTITIAL_FREQ = 25; // インタースティシャル広告の表示割合（％）
+
+    // protected ADGInterstitial interstitial = null;
+    protected InterstitialAd interstitial;
     protected static boolean showInterstitial = false;
 
     protected void makeAdsView(){
@@ -29,17 +36,17 @@ public class CommonAdsActivity extends AppCompatActivity {
 
         // 広告生成
         LinearLayout adsLayout = (LinearLayout)findViewById(R.id.ads);
-        if(adsLayout.getVisibility() == View.INVISIBLE) {
+        if(adsLayout != null && adsLayout.getVisibility() == View.INVISIBLE) {
             adsLayout.setVisibility(View.VISIBLE);
             isAds = false;
-            adg = new ADG(this);
-            adg.setLocationId("27341");
-            adg.setAdFrameSize(ADG.AdFrameSize.SP);
-            adg.setAdListener(new AdListener());
-            adg.setReloadWithVisibilityChanged(false);
-            adg.setFillerRetry(false);
-            adsLayout.addView(adg);
-            adg.start();
+            gadView = new AdView(this);
+            gadView.setAdUnitId(GAD_UNIT_ID);
+            gadView.setAdSize(AdSize.BANNER);
+            gadView.setAdListener(new GadListener());
+            adsLayout.addView(gadView);
+
+            AdRequest adRequest = new AdRequest.Builder().build();
+            gadView.loadAd(adRequest);
         }
     }
 
@@ -48,16 +55,25 @@ public class CommonAdsActivity extends AppCompatActivity {
             return;
         }
 
+        if(interstitial == null) {
+            interstitial = new InterstitialAd(this);
+            interstitial.setAdUnitId(GAD_INT_UNIT_ID);
+            interstitial.setAdListener(new GadInterstitialListener());
+        }
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+        interstitial.loadAd(adRequest);
+
         // Log.e("PrepareInterstitial", "PrepareInterstitial : "+getClass().getName());
 
-        interstitial = new ADGInterstitial(this);
-        interstitial.setLocationId("38148");
+        // interstitial = new ADGInterstitial(this);
+        // interstitial.setLocationId("38148");
         // interstitial.setLocationId("26803"); // テストID
         // interstitial.setEnableTestMode(true); // テストモード
         // interstitial.setSpan(100, true);
-        interstitial.setSpan(25, true);
-        interstitial.setAdListener(new InterstitialListener());
-        interstitial.preload();
+        // interstitial.setSpan(25, true);
+        // interstitial.setAdListener(new InterstitialListener());
+        // interstitial.preload();
     }
 
     protected void showInterstitial(){
@@ -71,28 +87,75 @@ public class CommonAdsActivity extends AppCompatActivity {
         }
 
         showInterstitial = false;
-        boolean showAd = interstitial.show();
-        // Log.e("ShowInterstitial","showAd result " + showAd);
+
+        // インタースティシャル広告を表示するか判定
+        int rand = (int)(Math.random() * 100);
+        if(rand >= INTERSTITIAL_FREQ){
+            return;
+        }
+
+        if(interstitial.isLoaded()) {
+            interstitial.show();
+        } else {
+            prepareInterstitial();
+        }
     }
 
     @Override
     protected void onResume() {
-        super.onResume();
         // ローテーション再開
-        if (adg != null) {
-            adg.start();
+        if (gadView != null) {
+             gadView.resume();
         }
+        super.onResume();
     }
 
     @Override
     protected void onPause() {
-        super.onPause();
         // ローテーション停止
-        if (adg != null) {
-            adg.stop();
+        if (gadView != null) {
+            gadView.pause();
         }
+        super.onPause();
     }
 
+    @Override
+    public void onDestroy() {
+        if(gadView != null){
+            gadView.destroy();
+        }
+        super.onDestroy();
+    }
+
+    protected void adjustViewHeight() {
+        // 必要時Override
+    }
+
+    class GadListener extends com.google.android.gms.ads.AdListener {
+        public void onAdLoaded() {
+            if(isAds == false) {
+                isAds = true;
+                adjustViewHeight();
+            }
+        }
+
+        public void onAdFailedToLoad(int errorCode) {}
+        public void onAdOpened() {}
+        public void onAdClosed() {}
+        public void onAdLeftApplication() {}
+    }
+
+    class GadInterstitialListener extends com.google.android.gms.ads.AdListener {
+        public void onAdLoaded() {}
+        public void onAdFailedToLoad(int errorCode) {}
+        public void onAdOpened() {}
+        public void onAdClosed() {
+            prepareInterstitial();
+        }
+        public void onAdLeftApplication() {}
+    }
+
+/*
     class AdListener extends ADGListener {
         private static final String _TAG = "ADGListener";
         @Override
@@ -155,9 +218,7 @@ public class CommonAdsActivity extends AppCompatActivity {
             interstitial.dismiss();
         }
     }
+*/
 
-    protected void adjustViewHeight() {
-        // 必要時Override
-    }
 
 }

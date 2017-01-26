@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        release {
+            keyAlias 'tatsuo0126'
+            keyPassword 'tfujiwar'
+            storeFile file('/Users/tatsuo/Documents/AppDev/tatsuo0126.keystore')
+            storePassword 'tfujiwar'
+        }
+    }
     compileSdkVersion 22
     buildToolsVersion '22.0.1'
     defaultConfig {
@@ -14,6 +22,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     productFlavors {
@@ -22,6 +31,6 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:22.2.1'
-    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.android.gms:play-services:7.5.0'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
 }

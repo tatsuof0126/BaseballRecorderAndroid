@@ -9,6 +9,11 @@
     <string name="title_activity_pitching_statistics">投手成績</string>
     <string name="title_activity_config">設定</string>
 
+    <!-- 本番 -->
+    <!-- <string name="banner_ad_unit_id">ca-app-pub-6719193336347757/5014225053</string> -->
+    <!-- テスト用 -->
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+
     <string name="hello_world">hello_world</string>
     <string name="action_settings">hello_world</string>
 </resources>

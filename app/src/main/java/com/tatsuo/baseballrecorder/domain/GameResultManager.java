@@ -42,13 +42,16 @@ public class GameResultManager {
 
         // 試合結果ファイルに絞る
         for(String fileName : fileList) {
-            if(fileName.contains("gameresult")){
+            if(fileName != null && fileName.contains("gameresult")){
                 selectedFileList.add(fileName);
             }
         }
 
         for(String fileName : selectedFileList){
-            resultList.add(loadGameResult(activity, fileName));
+            GameResult gameResult = loadGameResult(activity, fileName);
+            if(gameResult != null) {
+                resultList.add(gameResult);
+            }
         }
 
         Collections.sort(resultList, new GameResultComparator());

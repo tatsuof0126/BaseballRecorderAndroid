@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.tatsuo.baseballrecorder.domain.ConfigManager;
 import com.tatsuo.baseballrecorder.domain.GameResult;
@@ -33,6 +34,9 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
 
         // GoogleAnalytics初期化
         ((BaseballRecorderApplication)getApplication()).getTracker();
+
+        // Admob初期化
+        MobileAds.initialize(getApplicationContext(), GAD_APP_ID);
 
         // テストデータ作成用
         if(ConfigManager.makeTestData){

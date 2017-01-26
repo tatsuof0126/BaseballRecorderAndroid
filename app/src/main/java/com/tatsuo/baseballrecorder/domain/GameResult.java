@@ -338,68 +338,76 @@ public class GameResult implements Serializable {
     public static GameResult makeGameResult(String string){
         GameResult gameResult = new GameResult();
 
-        String[] stringList = string.split("\n", -1);
+        try {
 
-        // １行目：ファイル形式バージョン（V7）、UUID
-        String[] stringList1 = stringList[0].split(",", -1);
-        gameResult.setUuid(stringList1[1]);
+            String[] stringList = string.split("\n", -1);
 
-        // ２行目：試合情報（ID、年、月、日、場所、自チーム、相手チーム、自チーム得点、相手チーム得点、打点、得点、盗塁）
-        String[] stringList2 = stringList[1].split(",", -1);
-        gameResult.setResultId(Integer.parseInt(stringList2[0]));
-        gameResult.setYear(Integer.parseInt(stringList2[1]));
-        gameResult.setMonth(Integer.parseInt(stringList2[2]));
-        gameResult.setDay(Integer.parseInt(stringList2[3]));
-        gameResult.setPlace(stringList2[4]);
-        gameResult.setMyteam(stringList2[5]);
-        gameResult.setOtherteam(stringList2[6]);
-        gameResult.setMyscore(Integer.parseInt(stringList2[7]));
-        gameResult.setOtherscore(Integer.parseInt(stringList2[8]));
-        gameResult.setDaten(Integer.parseInt(stringList2[9]));
-        gameResult.setTokuten(Integer.parseInt(stringList2[10]));
-        gameResult.setSteal(Integer.parseInt(stringList2[11]));
+            // １行目：ファイル形式バージョン（V7）、UUID
+            String[] stringList1 = stringList[0].split(",", -1);
+            gameResult.setUuid(stringList1[1]);
 
-        // ３行目：タグ（カンマ区切り）
-        // とりあえずスルー
+            // ２行目：試合情報（ID、年、月、日、場所、自チーム、相手チーム、自チーム得点、相手チーム得点、打点、得点、盗塁）
+            String[] stringList2 = stringList[1].split(",", -1);
+            gameResult.setResultId(Integer.parseInt(stringList2[0]));
+            gameResult.setYear(Integer.parseInt(stringList2[1]));
+            gameResult.setMonth(Integer.parseInt(stringList2[2]));
+            gameResult.setDay(Integer.parseInt(stringList2[3]));
+            gameResult.setPlace(stringList2[4]);
+            gameResult.setMyteam(stringList2[5]);
+            gameResult.setOtherteam(stringList2[6]);
+            gameResult.setMyscore(Integer.parseInt(stringList2[7]));
+            gameResult.setOtherscore(Integer.parseInt(stringList2[8]));
+            gameResult.setDaten(Integer.parseInt(stringList2[9]));
+            gameResult.setTokuten(Integer.parseInt(stringList2[10]));
+            gameResult.setSteal(Integer.parseInt(stringList2[11]));
 
-        // ４行目：打撃成績（場所、結果、場所、結果・・・・）
-        List<BattingResult> battingResultList = new ArrayList<BattingResult>();
-        String[] stringList4 = stringList[3].split(",", -1);
-        for(int i=0;i<stringList4.length/2;i++){
-            BattingResult battingResult = new BattingResult();
-            battingResult.setPosition(Integer.parseInt(stringList4[i*2]));
-            battingResult.setResult(Integer.parseInt(stringList4[i*2+1]));
-            battingResultList.add(battingResult);
-        }
-        gameResult.setBattingResultList(battingResultList);
+            // ３行目：タグ（カンマ区切り）
+            // とりあえずスルー
 
-        // ５行目：投手成績（投球回、投球回小数点以下、安打、本塁打、奪三振、与四球、与死球、失点、自責点、完投、責任投手、投球数）
-        String[] stringList5 = stringList[4].split(",", -1);
-        if(stringList5.length >= 12) {
-            gameResult.setInning(Integer.parseInt(stringList5[0]));
-            gameResult.setInning2(Integer.parseInt(stringList5[1]));
-            gameResult.setHianda(Integer.parseInt(stringList5[2]));
-            gameResult.setHihomerun(Integer.parseInt(stringList5[3]));
-            gameResult.setDassanshin(Integer.parseInt(stringList5[4]));
-            gameResult.setYoshikyu(Integer.parseInt(stringList5[5]));
-            gameResult.setYoshikyu2(Integer.parseInt(stringList5[6]));
-            gameResult.setShitten(Integer.parseInt(stringList5[7]));
-            gameResult.setJisekiten(Integer.parseInt(stringList5[8]));
-            gameResult.setKanto(Integer.parseInt(stringList5[9]) == 1);
-            gameResult.setSekinin(Integer.parseInt(stringList5[10]));
-            gameResult.setTamakazu(Integer.parseInt(stringList5[11]));
-        }
-
-        // ６行目以降：メモ
-        StringBuilder stringBuilder = new StringBuilder();
-        for(int i=5;i<stringList.length;i++){
-            stringBuilder.append(stringList[i]);
-            // 最終行じゃないなら改行を足す
-            if(i != stringList.length - 1) {
-                stringBuilder.append("\n");
+            // ４行目：打撃成績（場所、結果、場所、結果・・・・）
+            List<BattingResult> battingResultList = new ArrayList<BattingResult>();
+            String[] stringList4 = stringList[3].split(",", -1);
+            for (int i = 0; i < stringList4.length / 2; i++) {
+                BattingResult battingResult = new BattingResult();
+                battingResult.setPosition(Integer.parseInt(stringList4[i * 2]));
+                battingResult.setResult(Integer.parseInt(stringList4[i * 2 + 1]));
+                battingResultList.add(battingResult);
             }
+            gameResult.setBattingResultList(battingResultList);
+
+            // ５行目：投手成績（投球回、投球回小数点以下、安打、本塁打、奪三振、与四球、与死球、失点、自責点、完投、責任投手、投球数）
+            String[] stringList5 = stringList[4].split(",", -1);
+            if (stringList5.length >= 12) {
+                gameResult.setInning(Integer.parseInt(stringList5[0]));
+                gameResult.setInning2(Integer.parseInt(stringList5[1]));
+                gameResult.setHianda(Integer.parseInt(stringList5[2]));
+                gameResult.setHihomerun(Integer.parseInt(stringList5[3]));
+                gameResult.setDassanshin(Integer.parseInt(stringList5[4]));
+                gameResult.setYoshikyu(Integer.parseInt(stringList5[5]));
+                gameResult.setYoshikyu2(Integer.parseInt(stringList5[6]));
+                gameResult.setShitten(Integer.parseInt(stringList5[7]));
+                gameResult.setJisekiten(Integer.parseInt(stringList5[8]));
+                gameResult.setKanto(Integer.parseInt(stringList5[9]) == 1);
+                gameResult.setSekinin(Integer.parseInt(stringList5[10]));
+                gameResult.setTamakazu(Integer.parseInt(stringList5[11]));
+            }
+
+            // ６行目以降：メモ
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 5; i < stringList.length; i++) {
+                stringBuilder.append(stringList[i]);
+                // 最終行じゃないなら改行を足す
+                if (i != stringList.length - 1) {
+                    stringBuilder.append("\n");
+                }
+            }
+            gameResult.setMemo(stringBuilder.toString());
+
+        } catch (Exception e) {
+            // 読み込みに失敗したらNULLを返す
+            e.printStackTrace();
+            gameResult = null;
         }
-        gameResult.setMemo(stringBuilder.toString());
 
         return gameResult;
     }
