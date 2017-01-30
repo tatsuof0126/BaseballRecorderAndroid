@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -208,6 +209,171 @@
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="先行/後攻"
+                        android:id="@+id/textView17" />
+
+                    <Space
+                        android:layout_width="15dp"
+                        android:layout_height="40dp" />
+
+                    <RadioGroup android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:orientation="horizontal"
+                        android:id="@+id/semeradio">
+
+                        <RadioButton
+                            android:text="先攻  "
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/semeradio1"
+                            android:layout_weight="1" />
+
+                        <RadioButton
+                            android:text="後攻  "
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/semeradio2"
+                            android:layout_weight="1" />
+
+                    </RadioGroup>
+
+                </LinearLayout>
+
+                <!--
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="打順/守備"
+                        android:id="@+id/textView18" />
+
+                    <Space
+                        android:layout_width="15dp"
+                        android:layout_height="20dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="１番ピッチャー"
+                        android:id="@+id/dajunshubi" />
+
+                    <Space
+                        android:layout_width="10dp"
+                        android:layout_height="20dp" />
+
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" 設定 "
+                        android:id="@+id/setdajunshubi_button" />
+
+                </LinearLayout>
+                -->
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="打順　　 "
+                        android:id="@+id/textView19" />
+
+                    <Space
+                        android:layout_width="15dp"
+                        android:layout_height="40dp" />
+
+                    <Spinner
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/dajunspinner"
+                        app:spinnerMode="dialog"
+                        android:elevation="8dp" />
+
+                    <Space
+                        android:layout_width="10dp"
+                        android:layout_height="20dp" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="守備位置 "
+                        android:id="@+id/textView20" />
+
+                    <Space
+                        android:layout_width="15dp"
+                        android:layout_height="40dp" />
+
+
+                    <Spinner
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/shubi1spinner"
+                        android:layout_weight="1"
+                        app:spinnerMode="dialog" />
+
+                    <Space
+                        android:layout_width="10dp"
+                        android:layout_height="20dp"
+                        android:visibility="gone" />
+
+                    <Spinner
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/shubi2spinner"
+                        android:layout_weight="1"
+                        android:elevation="11dp"
+                        android:visibility="visible"
+                        app:spinnerMode="dialog" />
+
+                    <Space
+                        android:layout_width="10dp"
+                        android:layout_height="20dp"
+                        android:visibility="gone" />
+
+                    <Spinner
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/shubi3spinner"
+                        android:layout_weight="1"
+                        android:elevation="11dp"
+                        android:visibility="gone"
+                        app:spinnerMode="dialog" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <TextView
@@ -215,6 +381,7 @@
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:text="打撃成績"
+                        android:layout_weight="0.15"
                         android:id="@+id/textView10" />
 
                     <Space
@@ -307,8 +474,32 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="盗塁"
+                        android:text="失策"
                         android:id="@+id/textView13"
+                        android:layout_weight="0.2"
+                        android:gravity="right" />
+
+                    <EditText
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="text|number"
+                        android:ems="10"
+                        android:id="@+id/error"
+                        android:layout_weight="0.15"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="盗塁"
+                        android:id="@+id/textView15"
                         android:layout_weight="0.2"
                         android:gravity="right" />
 
@@ -320,6 +511,30 @@
                         android:id="@+id/steal"
                         android:layout_weight="0.15"
                         android:gravity="center" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="盗塁死"
+                        android:id="@+id/textView16"
+                        android:layout_weight="0.2"
+                        android:gravity="right" />
+
+                    <EditText
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="text|number"
+                        android:ems="10"
+                        android:id="@+id/stealout"
+                        android:layout_weight="0.15"
+                        android:gravity="center" />
+
+                    <Space
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.35" />
+
                 </LinearLayout>
 
                 <LinearLayout

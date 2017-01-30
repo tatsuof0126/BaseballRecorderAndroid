@@ -9,18 +9,19 @@ public class BattingResult implements Serializable {
 
     public static final String[] POSITIONS = {"","ピッチャー","キャッチャー","ファースト","セカンド","サード","ショート","レフト","センター","ライト","左中間","右中間","レフト線","ライト線"};
     public static final String[] POSITIONS_SHORT = {"","投","捕","一","二","三","遊","左","中","右","左中","右中","左線","右線"};
-    public static final String[] POSITIONS_PICKER = {"ピッチャー","キャッチャー","ファースト","セカンド","サード","ショート","レフト","センター","ライト","左中間","右中間","レフト線","ライト線"};
+    // public static final String[] POSITIONS_PICKER = {"ピッチャー","キャッチャー","ファースト","セカンド","サード","ショート","レフト","センター","ライト","左中間","右中間","レフト線","ライト線"};
 
-    public static final String[] RESULTS = {"","ゴロ","フライ","ファールフライ","ライナー","エラー","フィルダースチョイス","ヒット","二塁打","三塁打","ホームラン","犠打","三振","振り逃げ","四球","死球","打撃妨害"};
-    public static final String[] RESULTS_SHORT = {"","ゴ","飛","邪飛","直","失","野選","安","二","三","本","犠","三振","振逃","四球","死球","打妨"};
-    public static final String[] RESULTS_PICKER = {"ゴロ","フライ","ファールフライ","ライナー","エラー","フィルダースチョイス","ヒット","二塁打","三塁打","ホームラン","犠打","三振","振り逃げ","四球","死球","打撃妨害"};
-    public static final String[] RESULTS_COLOR = {"","","","","","","","#FF4444","#FF4444","#FF4444","#FF4444","#4444FF","","","#4444FF","#4444FF",""};
+    public static final String[] RESULTS = {"","ゴロ","フライ","ファールフライ","ライナー","エラー","フィルダースチョイス","ヒット","二塁打","三塁打","ホームラン","犠打","三振","振り逃げ","四球","死球","打撃妨害","併殺打"};
+    public static final String[] RESULTS_SHORT = {"","ゴ","飛","邪飛","直","失","野選","安","二","三","本","犠","三振","振逃","四球","死球","打妨","併殺"};
+    // public static final String[] RESULTS_PICKER = {"ゴロ","フライ","ファールフライ","ライナー","エラー","フィルダースチョイス","ヒット","二塁打","三塁打","ホームラン","犠打/犠飛","三振","振り逃げ","四球","死球","打撃妨害","併殺打"};
+    public static final String[] RESULTS_COLOR = {"","","","","","","","#FF4444","#FF4444","#FF4444","#FF4444","#4444FF","","","#4444FF","#4444FF","",""};
+    public static final String SACRIFICEFLIES = "犠飛";
 
     public static final String[] PICKER1 = {"三振","四球","死球","ピッチャー","キャッチャー","ファースト","セカンド","サード","ショート","レフト","センター","ライト","左中間","右中間","レフト線","ライト線","振り逃げ","打撃妨害"};
-    public static final String[] PICKER2 = {"ゴロ","フライ","ファールフライ","ライナー","エラー","フィルダースチョイス","ヒット","二塁打","三塁打","ホームラン","犠打"};
+    public static final String[] PICKER2 = {"ゴロ","フライ","ファールフライ","ライナー","エラー","フィルダースチョイス","ヒット","二塁打","三塁打","ホームラン","犠打/犠飛","併殺打"};
     public static final boolean[] NEEDS_POSITION = {false,false,false,true,true,true,true,true,true,true,true,true,true,true,true,true,false,false};
 
-    public static final boolean[] NEED_POSITION = {false,true,true,true,true,true,true,true,true,true,true,true,false,false,false,false,true};
+    // public static final boolean[] NEED_POSITION = {false,true,true,true,true,true,true,true,true,true,true,true,false,false,false,false,true};
 
     public static final int TYPE_ATBATS = 0;
     public static final int TYPE_HITS = 1;
@@ -31,18 +32,20 @@ public class BattingResult implements Serializable {
     public static final int TYPE_STRIKEOUTS = 6;
     public static final int TYPE_WALKS = 7;
     public static final int TYPE_SACRIFICES = 8;
-    public static final int TYPE_SACRIFICEFLIES = 9;
+    public static final int TYPE_SACRIFICEFLIES = 99;
+    public static final int TYPE_DOUBLEPLAY = 9;
 
     public static final int[][] BATTING_COUNT = {
-            {0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,0,0}, // 打数
-            {0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0}, // 安打
-            {0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0}, // ヒット
-            {0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0}, // 二塁打
-            {0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0}, // 三塁打
-            {0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0}, // ホームラン
-            {0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0}, // 三振
-            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0}, // 四死球
-            {0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0}  // 犠打
+            {0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,0,0,1}, // 打数
+            {0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0}, // 安打
+            {0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0}, // ヒット
+            {0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0}, // 二塁打
+            {0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0}, // 三塁打
+            {0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0}, // ホームラン
+            {0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0}, // 三振
+            {0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0}, // 四死球
+            {0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0}, // 犠打
+            {0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1}  // 併殺打
     };
 
     private int position;
@@ -85,9 +88,13 @@ public class BattingResult implements Serializable {
         String resultString = "";
         if(position == NON_REGISTED){
             resultString = RESULTS[result];
+        } else if(isSacrificefly()) {
+            // 犠牲フライの場合は「犠飛」固定
+            resultString = POSITIONS[position]+SACRIFICEFLIES;
         } else {
             resultString = POSITIONS[position]+RESULTS[result];
         }
+
         if(withColor && RESULTS_COLOR[result].equals("") == false){
             String beforeTag = "<font color=\""+RESULTS_COLOR[result]+"\">";
             String afterTag = "</font>";
@@ -120,13 +127,21 @@ public class BattingResult implements Serializable {
             return BATTING_COUNT[type][result];
         } else {
             // 犠打かつレフト・センター・ライト・左中間・右中間・レフト線・ライト線を犠飛として返す
-            if(result == 11 &&
-                    (position == 7 || position == 8 || position == 9 || position == 10 ||
-                            position == 11 || position == 12 || position == 13)){
+            if(isSacrificefly()){
                 return 1;
             }
             return 0;
         }
+    }
+
+    private boolean isSacrificefly(){
+        // 犠打かつレフト・センター・ライト・左中間・右中間・レフト線・ライト線を犠飛として返す
+        if(result == 11 &&
+                (position == 7 || position == 8 || position == 9 || position == 10 ||
+                        position == 11 || position == 12 || position == 13)){
+            return true;
+        }
+        return false;
     }
 
 }

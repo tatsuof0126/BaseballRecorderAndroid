@@ -44,7 +44,9 @@
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:text="場所"
-                        android:id="@+id/place_text" />
+                        android:id="@+id/place_text"
+                        android:layout_weight="1" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -57,13 +59,28 @@
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:text="スコア"
-                        android:id="@+id/score_text" />
+                        android:id="@+id/score_text"
+                        android:layout_weight="1" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" >
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="(先攻)"
+                        android:id="@+id/seme_text"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -79,6 +96,20 @@
                         android:text="シェア"
                         android:id="@+id/share_button" />
 
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" >
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="１番ピッチャー"
+                        android:id="@+id/dajunshubi_text"
+                        android:layout_weight="1" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -98,6 +129,19 @@
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:text="  打点 0 得点 0 盗塁 0"
                         android:id="@+id/etc_text" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" >
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="  盗塁 0 盗塁死 0"
+                        android:id="@+id/etc2_text" />
                 </LinearLayout>
 
                 <LinearLayout

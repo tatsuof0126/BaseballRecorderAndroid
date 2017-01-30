@@ -7,16 +7,22 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +47,12 @@ public class InputGameResultActivity extends CommonAdsActivity
     private static final int NO_TARGET = -999;
     private GameResult targetGameResult = null;
     private int targetBattingResult = NO_TARGET;
+    private int spinnerMode = SPINNER_MODE_NONE;
+
+    private static final int SPINNER_MODE_NONE = 0;
+    private static final int SPINNER_MODE_1 = 1;
+    private static final int SPINNER_MODE_2 = 2;
+    private static final int SPINNER_MODE_3 = 3;
 
     private static final int MOVE_PITCHING = 1;
 
@@ -223,6 +235,46 @@ public class InputGameResultActivity extends CommonAdsActivity
         otherscoreText.setNextFocusDownId(R.id.daten);
         otherscoreText.setOnFocusChangeListener(this);
 
+        RadioButton semeRadio1 = (RadioButton)findViewById(R.id.semeradio1);
+        RadioButton semeRadio2 = (RadioButton)findViewById(R.id.semeradio2);
+        semeRadio1.setChecked(false);
+        semeRadio2.setChecked(false);
+        if(targetGameResult.getSeme() == 1){
+            semeRadio1.setChecked(true);
+        } else if(targetGameResult.getSeme() == 2){
+            semeRadio2.setChecked(true);
+        }
+
+        Spinner dajunSpinner = (Spinner)findViewById(R.id.dajunspinner);
+        ArrayAdapter<String> dajunAdapter
+                = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, GameResult.DAJUN_SPINNER);
+        dajunSpinner.setAdapter(dajunAdapter);
+        dajunSpinner.setSelection(targetGameResult.getDajun());
+
+        Spinner shubi1Spinner = (Spinner)findViewById(R.id.shubi1spinner);
+        shubi1Spinner.setSelection(targetGameResult.getShubi1());
+
+        Spinner shubi2Spinner = (Spinner)findViewById(R.id.shubi2spinner);
+        shubi2Spinner.setSelection(targetGameResult.getShubi2());
+
+        Spinner shubi3Spinner = (Spinner)findViewById(R.id.shubi3spinner);
+        shubi3Spinner.setSelection(targetGameResult.getShubi3());
+        spinnerMode = SPINNER_MODE_NONE;
+
+        adjustShubiSpinnerVisibility();
+
+        OnItemSelectedListener listener = new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
+                adjustShubiSpinnerVisibility();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        };
+        shubi1Spinner.setOnItemSelectedListener(listener);
+        shubi2Spinner.setOnItemSelectedListener(listener);
+        shubi3Spinner.setOnItemSelectedListener(listener);
+
         showBattingResult();
 
         EditText datenText = (EditText)findViewById(R.id.daten);
@@ -232,16 +284,146 @@ public class InputGameResultActivity extends CommonAdsActivity
 
         EditText tokutenText = (EditText)findViewById(R.id.tokuten);
         tokutenText.setText(Integer.toString(targetGameResult.getTokuten()));
-        tokutenText.setNextFocusDownId(R.id.steal);
+        tokutenText.setNextFocusDownId(R.id.error);
         tokutenText.setOnFocusChangeListener(this);
+
+        EditText errorText = (EditText)findViewById(R.id.error);
+        errorText.setText(Integer.toString(targetGameResult.getError()));
+        errorText.setNextFocusDownId(R.id.steal);
+        errorText.setOnFocusChangeListener(this);
 
         EditText stealText = (EditText)findViewById(R.id.steal);
         stealText.setText(Integer.toString(targetGameResult.getSteal()));
-        stealText.setNextFocusDownId(R.id.memo);
+        stealText.setNextFocusDownId(R.id.stealout);
         stealText.setOnFocusChangeListener(this);
+
+        EditText stealOutText = (EditText)findViewById(R.id.stealout);
+        stealOutText.setText(Integer.toString(targetGameResult.getStealOut()));
+        stealOutText.setNextFocusDownId(R.id.memo);
+        stealOutText.setOnFocusChangeListener(this);
 
         EditText memoText = (EditText)findViewById(R.id.memo);
         memoText.setText(targetGameResult.getMemo());
+    }
+
+    private void adjustShubiSpinnerVisibility(){
+        ArrayAdapter<String> shubiAdapter
+                = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, GameResult.SHUBI_SPINNER);
+
+        ArrayAdapter<String> shubiShortAdapter
+                = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, GameResult.SHUBI_SHORT_SPINNER);
+
+        Spinner shubi1Spinner = (Spinner)findViewById(R.id.shubi1spinner);
+        Spinner shubi2Spinner = (Spinner)findViewById(R.id.shubi2spinner);
+        Spinner shubi3Spinner = (Spinner)findViewById(R.id.shubi3spinner);
+
+        int shubi1 = shubi1Spinner.getSelectedItemPosition();
+        int shubi2 = shubi2Spinner.getSelectedItemPosition();
+        int shubi3 = shubi3Spinner.getSelectedItemPosition();
+
+        int afterMode = getShubiSpinnerMode(shubi1, shubi2, shubi3);
+
+        Log.e("[ADJUST SPINNER]", "before:"+spinnerMode+" after:"+afterMode+"  "+shubi1+":"+shubi2+":"+shubi3);
+
+        if(spinnerMode == afterMode){
+            return;
+        }
+        spinnerMode = afterMode;
+
+        if(spinnerMode == SPINNER_MODE_1){
+            shubi1Spinner.setAdapter(shubiAdapter);
+            shubi1Spinner.setSelection(shubi1);
+            shubi2Spinner.setVisibility(View.GONE);
+            shubi3Spinner.setVisibility(View.GONE);
+        } else if(spinnerMode == SPINNER_MODE_2){
+            shubi1Spinner.setAdapter(shubiAdapter);
+            shubi2Spinner.setAdapter(shubiShortAdapter);
+            shubi1Spinner.setSelection(shubi1);
+            shubi2Spinner.setSelection(shubi2);
+            shubi2Spinner.setVisibility(View.VISIBLE);
+            shubi3Spinner.setVisibility(View.GONE);
+        } else if(spinnerMode == SPINNER_MODE_3){
+            shubi1Spinner.setAdapter(shubiShortAdapter);
+            shubi2Spinner.setAdapter(shubiShortAdapter);
+            shubi3Spinner.setAdapter(shubiShortAdapter);
+            shubi1Spinner.setSelection(shubi1);
+            shubi2Spinner.setSelection(shubi2);
+            shubi3Spinner.setSelection(shubi3);
+            shubi2Spinner.setVisibility(View.VISIBLE);
+            shubi3Spinner.setVisibility(View.VISIBLE);
+        }
+    }
+
+    /*
+    private void adjustShubiSpinnerVisibility(Spinner parent, int position){
+        Spinner shubi1Spinner = (Spinner)findViewById(R.id.shubi1spinner);
+        Spinner shubi2Spinner = (Spinner)findViewById(R.id.shubi2spinner);
+        Spinner shubi3Spinner = (Spinner)findViewById(R.id.shubi3spinner);
+
+        int shubi1 = shubi1Spinner.getSelectedItemPosition();
+        int shubi2 = shubi2Spinner.getSelectedItemPosition();
+        int shubi3 = shubi3Spinner.getSelectedItemPosition();
+
+        int afterMode = getShubiSpinnerMode(shubi1, shubi2, shubi3);
+
+
+        // ログコード
+        int target = 0;
+        if(parent == shubi1Spinner){
+            target = 1;
+        } else if(parent == shubi2Spinner){
+            target = 2;
+        } else if(parent == shubi3Spinner){
+            target = 3;
+        }
+        Log.e("MODE(ADJUST:"+target+")", "before:"+spinnerMode+" after:"+afterMode+"  "+shubi1+":"+shubi2+":"+shubi3);
+
+
+
+        if(spinnerMode == afterMode){
+            return;
+        }
+
+        spinnerMode = afterMode;
+
+        ArrayAdapter<String> shubiAdapter
+                = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, GameResult.SHUBI_SPINNER);
+
+        ArrayAdapter<String> shubiShortAdapter
+                = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, GameResult.SHUBI_SHORT_SPINNER);
+
+        if(afterMode == SPINNER_MODE_1){
+            shubi1Spinner.setAdapter(shubiAdapter);
+            shubi1Spinner.setSelection(shubi1);
+            shubi2Spinner.setVisibility(View.GONE);
+            shubi3Spinner.setVisibility(View.GONE);
+        } else if(afterMode == SPINNER_MODE_2){
+            shubi1Spinner.setAdapter(shubiAdapter);
+            shubi2Spinner.setAdapter(shubiShortAdapter);
+            shubi1Spinner.setSelection(shubi1);
+            shubi2Spinner.setSelection(shubi2);
+            shubi2Spinner.setVisibility(View.VISIBLE);
+            shubi3Spinner.setVisibility(View.GONE);
+        } else if(afterMode == SPINNER_MODE_3){
+            shubi1Spinner.setAdapter(shubiShortAdapter);
+            shubi2Spinner.setAdapter(shubiShortAdapter);
+            shubi3Spinner.setAdapter(shubiShortAdapter);
+            shubi1Spinner.setSelection(shubi1);
+            shubi2Spinner.setSelection(shubi2);
+            shubi3Spinner.setSelection(shubi3);
+            shubi2Spinner.setVisibility(View.VISIBLE);
+            shubi3Spinner.setVisibility(View.VISIBLE);
+        }
+    }
+*/
+    private int getShubiSpinnerMode(int shubi1, int shubi2, int shubi3) {
+        if (shubi1 == 0 && shubi2 == 0 && shubi3 == 0) {
+            return SPINNER_MODE_1;
+        } else if (shubi2 == 0 && shubi3 == 0) {
+            return SPINNER_MODE_2;
+        } else {
+            return SPINNER_MODE_3;
+        }
     }
 
     @Override
@@ -287,21 +469,23 @@ public class InputGameResultActivity extends CommonAdsActivity
         EditText otherscoreText = (EditText)findViewById(R.id.otherscore);
         EditText datenText = (EditText)findViewById(R.id.daten);
         EditText tokutenText = (EditText)findViewById(R.id.tokuten);
+        EditText errorText = (EditText)findViewById(R.id.error);
         EditText stealText = (EditText)findViewById(R.id.steal);
+        EditText stealOutText = (EditText)findViewById(R.id.stealout);
 
         if(hasFocus == true) {
             // 数値系の項目で「0」ならフォーカスがあたったとき空にする
-            if((v == myscoreText || v == otherscoreText || v == datenText ||
-                    v == tokutenText || v == stealText) &&
+            if((v == myscoreText || v == otherscoreText || v == datenText || v == tokutenText ||
+                    v == errorText || v == stealText || v == stealOutText) &&
                     "0".equals(((EditText)v).getText().toString())) {
-                ((EditText) v).setText("");
+                ((EditText)v).setText("");
             }
         } else {
             // 数値系の項目で空ならフォーカスがはずれたとき0にする
-            if((v == myscoreText || v == otherscoreText || v == datenText ||
-                    v == tokutenText || v == stealText) &&
+            if((v == myscoreText || v == otherscoreText || v == datenText || v == tokutenText ||
+                    v == errorText || v == stealText || v == stealOutText) &&
                     "".equals(((EditText)v).getText().toString())) {
-                ((EditText) v).setText("0");
+                ((EditText)v).setText("0");
             }
         }
     }
@@ -385,7 +569,9 @@ public class InputGameResultActivity extends CommonAdsActivity
         String otherscoreStr = ((EditText)findViewById(R.id.otherscore)).getText().toString();
         String datenStr = ((EditText)findViewById(R.id.daten)).getText().toString();
         String tokutenStr = ((EditText)findViewById(R.id.tokuten)).getText().toString();
+        String errorStr = ((EditText)findViewById(R.id.error)).getText().toString();
         String stealStr = ((EditText)findViewById(R.id.steal)).getText().toString();
+        String stealOutStr = ((EditText)findViewById(R.id.stealout)).getText().toString();
         String memoStr = ((EditText)findViewById(R.id.memo)).getText().toString();
 
         // 半角カンマを全角に変換
@@ -404,14 +590,14 @@ public class InputGameResultActivity extends CommonAdsActivity
         boolean datecheck = false;
         boolean numbercheck = false;
 
-        // 場所とチーム・相手チームは必須
-        if("".equals(placeStr) || "".equals(myteamStr) || "".equals(otherteamStr)){
+        // 場所とチーム・相手チームは必須 → 場所は必須しないことにした
+        if("".equals(myteamStr) || "".equals(otherteamStr)){
             noinputcheck = true;
         }
 
         // 日付のチェック
         try {
-            DateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             format.setLenient(false);
             format.parse(yearStr+"-"+monthStr+"-"+dayStr);
         } catch (ParseException e) {
@@ -424,27 +610,23 @@ public class InputGameResultActivity extends CommonAdsActivity
             Integer.parseInt(otherscoreStr);
             Integer.parseInt(datenStr);
             Integer.parseInt(tokutenStr);
+            Integer.parseInt(errorStr);
             Integer.parseInt(stealStr);
+            Integer.parseInt(stealOutStr);
         } catch (NumberFormatException e) {
             numbercheck = true;
         }
 
         if(noinputcheck) {
             errorMsg = "入力されていない項目があります";
-            // Toast.makeText(this, "入力されていない項目があります", Toast.LENGTH_SHORT).show();
-            // return;
         }
 
         if(datecheck) {
             errorMsg = "日付が正しくありません";
-            // Toast.makeText(this, "日付が正しくありません", Toast.LENGTH_SHORT).show();
-            // return;
         }
 
         if(numbercheck) {
             errorMsg = "数値の入力が正しくありません";
-            // Toast.makeText(this, "数値の入力が正しくありません", Toast.LENGTH_SHORT).show();
-            // return;
         }
 
         return errorMsg;
@@ -460,9 +642,35 @@ public class InputGameResultActivity extends CommonAdsActivity
         String otherteamStr = ((EditText)findViewById(R.id.otherteam)).getText().toString();
         String myscoreStr = ((EditText)findViewById(R.id.myscore)).getText().toString();
         String otherscoreStr = ((EditText)findViewById(R.id.otherscore)).getText().toString();
+        RadioButton semeRadio1 = (RadioButton)findViewById(R.id.semeradio1);
+        RadioButton semeRadio2 = (RadioButton)findViewById(R.id.semeradio2);
+        int semeInt = 0;
+        if(semeRadio1.isChecked()){
+            semeInt = 1;
+        } else if(semeRadio2.isChecked()){
+            semeInt = 2;
+        }
+        int dajunInt = ((Spinner)findViewById(R.id.dajunspinner)).getSelectedItemPosition();
+        int shubi1Int = ((Spinner)findViewById(R.id.shubi1spinner)).getSelectedItemPosition();
+        int shubi2Int = ((Spinner)findViewById(R.id.shubi2spinner)).getSelectedItemPosition();
+        int shubi3Int = ((Spinner)findViewById(R.id.shubi3spinner)).getSelectedItemPosition();
+        // 守備が空の場合は詰める
+        if(shubi1Int == 0 && shubi2Int == 0){
+            shubi1Int = shubi3Int;
+            shubi3Int = 0;
+        } else if(shubi1Int == 0){
+            shubi1Int = shubi2Int;
+            shubi2Int = shubi3Int;
+            shubi3Int = 0;
+        } else if(shubi2Int == 0){
+            shubi2Int = shubi3Int;
+            shubi3Int = 0;
+        }
         String datenStr = ((EditText)findViewById(R.id.daten)).getText().toString();
         String tokutenStr = ((EditText)findViewById(R.id.tokuten)).getText().toString();
+        String errorStr = ((EditText)findViewById(R.id.error)).getText().toString();
         String stealStr = ((EditText)findViewById(R.id.steal)).getText().toString();
+        String stealOutStr = ((EditText)findViewById(R.id.stealout)).getText().toString();
         String memoStr = ((EditText)findViewById(R.id.memo)).getText().toString();
 
         // 半角カンマを全角に変換
@@ -485,9 +693,16 @@ public class InputGameResultActivity extends CommonAdsActivity
         targetGameResult.setOtherteam(otherteamStr);
         targetGameResult.setMyscore(Integer.parseInt(myscoreStr));
         targetGameResult.setOtherscore(Integer.parseInt(otherscoreStr));
+        targetGameResult.setSeme(semeInt);
+        targetGameResult.setDajun(dajunInt);
+        targetGameResult.setShubi1(shubi1Int);
+        targetGameResult.setShubi2(shubi2Int);
+        targetGameResult.setShubi3(shubi3Int);
         targetGameResult.setDaten(Integer.parseInt(datenStr));
         targetGameResult.setTokuten(Integer.parseInt(tokutenStr));
+        targetGameResult.setError(Integer.parseInt(errorStr));
         targetGameResult.setSteal(Integer.parseInt(stealStr));
+        targetGameResult.setStealOut(Integer.parseInt(stealOutStr));
         targetGameResult.setMemo(memoStr);
     }
 
@@ -514,7 +729,7 @@ public class InputGameResultActivity extends CommonAdsActivity
                 if(BattingResult.NEEDS_POSITION[i]){
                     showResultPicker2(i);
                 } else {
-                    makeBattingResult2(i);
+                    makeBattingResult(i);
                 }
             }
         });
@@ -527,28 +742,24 @@ public class InputGameResultActivity extends CommonAdsActivity
         builder.setItems(BattingResult.PICKER2, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                makeBattingResult2(result, i);
+                makeBattingResult(result, i);
             }
         });
         builder.show();
     }
 
-    private void makeBattingResult2(int picker1){
+    private void makeBattingResult(int picker1){
         BattingResult battingResult = null;
         if(picker1 == 0){
-            battingResult = new BattingResult(12);
-        }
-        if(picker1 == 1){
-            battingResult = new BattingResult(14);
-        }
-        if(picker1 == 2){
-            battingResult = new BattingResult(15);
-        }
-        if(picker1 == 16){
-            battingResult = new BattingResult(13);
-        }
-        if(picker1 == 17){
-            battingResult = new BattingResult(16);
+            battingResult = new BattingResult(12); // 三振
+        } else if(picker1 == 1){
+            battingResult = new BattingResult(14); // 四球
+        } else if(picker1 == 2){
+            battingResult = new BattingResult(15); // 死球
+        } else if(picker1 == 16){
+            battingResult = new BattingResult(13); // 振り逃げ
+        } else if(picker1 == 17){
+            battingResult = new BattingResult(16); // 打撃妨害
         }
 
         if(battingResult != null) {
@@ -556,12 +767,20 @@ public class InputGameResultActivity extends CommonAdsActivity
         }
     }
 
-    private void makeBattingResult2(int picker1, int picker2){
-        int position = picker1 - 2;
-        int result = picker2 + 1;
+    private void makeBattingResult(int picker1, int picker2){
+        int position = picker1 - 2; // -2するとpositionの値になる
+
+        int result = 0;
+        if(picker2 == 11){
+            result = 17; // 併殺の場合のみ固定
+        } else {
+            result = picker2 + 1; // 併殺以外は+1するとresultの値になる
+        }
+
         updateBattingResult(new BattingResult(position, result));
     }
 
+    /*
     private void showResultPicker(int target){
         targetBattingResult = target;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -581,7 +800,7 @@ public class InputGameResultActivity extends CommonAdsActivity
         builder.setItems(BattingResult.POSITIONS_PICKER, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                makeBattingResult(i + 1, result);
+                makeBattingResult(i+1, result);
             }
         });
         builder.show();
@@ -601,6 +820,7 @@ public class InputGameResultActivity extends CommonAdsActivity
     private void makeBattingResult(int position, int result) {
         updateBattingResult(new BattingResult(position, result));
     }
+*/
 
     private void showSelectResultPickerForModify() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

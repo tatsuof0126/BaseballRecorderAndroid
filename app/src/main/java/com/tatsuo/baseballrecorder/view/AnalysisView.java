@@ -8,7 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.media.MediaCodecInfo;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -66,6 +65,7 @@ public class AnalysisView extends View {
             Color.RED,
             Color.RED,
             Color.RED,
+            Color.DKGRAY,
             Color.DKGRAY,
             Color.DKGRAY,
             Color.DKGRAY,

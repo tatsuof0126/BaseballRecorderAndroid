@@ -105,7 +105,7 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
         walksText.setText(""+battingStatistics.getWalks());
 
         TextView sacrificesText = (TextView)findViewById(R.id.sacrifices);
-        sacrificesText.setText(""+battingStatistics.getSacrifices());
+        sacrificesText.setText(""+(battingStatistics.getSacrifices() - battingStatistics.getSacrificeflies()));
 
         TextView datenText = (TextView)findViewById(R.id.daten);
         datenText.setText(""+battingStatistics.getDaten());
@@ -113,12 +113,21 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
         TextView tokutenText = (TextView)findViewById(R.id.tokuten);
         tokutenText.setText(""+battingStatistics.getTokuten());
 
+        TextView sacrificeFlyText = (TextView)findViewById(R.id.sacrificefly);
+        sacrificeFlyText.setText(""+battingStatistics.getSacrificeflies());
+
         TextView stealText = (TextView)findViewById(R.id.steal);
         stealText.setText(""+battingStatistics.getSteal());
 
+        TextView stealOutText = (TextView)findViewById(R.id.stealout);
+        stealOutText.setText(""+battingStatistics.getStealOut());
+
+        TextView errorText = (TextView)findViewById(R.id.error);
+        errorText.setText(""+battingStatistics.getError());
+
         TextView stats1Text = (TextView)findViewById(R.id.stats1);
         stats1Text.setText("打率 "+Utility.getFloatString3(battingStatistics.getAverage())
-            +"  出塁率 "+Utility.getFloatString3(battingStatistics.getObp())
+                +"  出塁率 "+Utility.getFloatString3(battingStatistics.getObp())
                 +"  長打率 "+Utility.getFloatString3(battingStatistics.getSlg()));
 
         TextView stats2Text = (TextView)findViewById(R.id.stats2);
@@ -127,7 +136,8 @@ public class BattingStatisticsActivity extends CommonStatisticsActivity implemen
                 +"   IsoP "+Utility.getFloatString3(battingStatistics.getIsop()));
 
         TextView stats3Text = (TextView)findViewById(R.id.stats3);
-        stats3Text.setText("RC27 " + Utility.getFloatString2(battingStatistics.getRc27()));
+        stats3Text.setText("盗塁成功率 " + Utility.getFloatString3(battingStatistics.getStealrate())
+                +"  RC27 " + Utility.getFloatString2(battingStatistics.getRc27()));
 
     }
 

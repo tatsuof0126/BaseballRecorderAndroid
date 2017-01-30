@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import static android.view.View.GONE;
+
 public class ShowGameResultActivity extends CommonAdsActivity implements View.OnClickListener {
 
     private static final int NO_TARGET = -999;
@@ -103,18 +105,69 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
         dateText.setText(targetGameResult.getYear() + "年" + targetGameResult.getMonth() + "月"
                 + targetGameResult.getDay() + "日");
 
-        TextView placeText = (TextView)findViewById(R.id.place_text);
-        placeText.setText(targetGameResult.getPlace());
-
         TextView scoreText = (TextView)findViewById(R.id.score_text);
         scoreText.setText(targetGameResult.getMyteam()+" "+targetGameResult.getMyscore()+ " - "
                 +targetGameResult.getOtherscore()+" "+targetGameResult.getOtherteam());
 
+        // 場所
+        TextView placeText = (TextView)findViewById(R.id.place_text);
+        if("".equals(targetGameResult.getPlace())){
+            placeText.setVisibility(View.GONE);
+        } else {
+            placeText.setVisibility(View.VISIBLE);
+        }
+        placeText.setText(targetGameResult.getPlace());
+
+        // 先攻/後攻
+        TextView semeText = (TextView)findViewById(R.id.seme_text);
+        if(targetGameResult.getSeme() == 0){
+            semeText.setVisibility(GONE);
+            semeText.setText("");
+        } else if(targetGameResult.getSeme() == 1){
+            semeText.setVisibility(View.VISIBLE);
+            semeText.setText("  (先攻)");
+        } else if(targetGameResult.getSeme() == 2){
+            semeText.setVisibility(View.VISIBLE);
+            semeText.setText("  (後攻)");
+        }
+
+        // 打順と守備位置
+        TextView dajunShubiText = (TextView)findViewById(R.id.dajunshubi_text);
+        if(targetGameResult.getDajun() == 0 && targetGameResult.getShubi1() == 0){
+            dajunShubiText.setVisibility(View.GONE);
+        } else {
+            dajunShubiText.setVisibility(View.VISIBLE);
+        }
+
+        StringBuilder dajunShubiStr = new StringBuilder("  ");
+        if(targetGameResult.getDajun() != 0) {
+            dajunShubiStr.append(GameResult.DAJUN_STRING[targetGameResult.getDajun()]);
+            dajunShubiStr.append(" ");
+        }
+        String[] shubiString = targetGameResult.getShubi3() == 0 ? GameResult.SHUBI_STRING : GameResult.SHUBI_SHORT_STRING;
+        if(targetGameResult.getShubi1() != 0 ){
+            dajunShubiStr.append(shubiString[targetGameResult.getShubi1()]);
+        }
+        if(targetGameResult.getShubi2() != 0 ){
+            dajunShubiStr.append("→");
+            dajunShubiStr.append(shubiString[targetGameResult.getShubi2()]);
+        }
+        if(targetGameResult.getShubi3() != 0 ){
+            dajunShubiStr.append("→");
+            dajunShubiStr.append(shubiString[targetGameResult.getShubi3()]);
+        }
+        dajunShubiText.setText(dajunShubiStr.toString());
+
+        // 打席の結果
         showBattingResult();
 
+        // その他の打撃成績
         TextView etcText = (TextView)findViewById(R.id.etc_text);
         etcText.setText("  打点 " + targetGameResult.getDaten() + "  得点 " + targetGameResult.getTokuten()
-                + "  盗塁 " + targetGameResult.getSteal());
+                + "  失策 " + targetGameResult.getError());
+
+        TextView etc2Text = (TextView)findViewById(R.id.etc2_text);
+        etc2Text.setText("  盗塁 " + targetGameResult.getSteal() + "  盗塁死 " + targetGameResult.getStealOut());
 
         // 投手成績
         LinearLayout pitchingTitleLayout = (LinearLayout)findViewById(R.id.pitching_title_layout);
@@ -125,12 +178,12 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
         LinearLayout pitchingResult5Layout = (LinearLayout)findViewById(R.id.pitching_result5_layout);
 
         if(targetGameResult.getInning() == 0 && targetGameResult.getInning2() == 0){
-            pitchingTitleLayout.setVisibility(View.GONE);
-            pitchingResult1Layout.setVisibility(View.GONE);
-            pitchingResult2Layout.setVisibility(View.GONE);
-            pitchingResult3Layout.setVisibility(View.GONE);
-            pitchingResult4Layout.setVisibility(View.GONE);
-            pitchingResult5Layout.setVisibility(View.GONE);
+            pitchingTitleLayout.setVisibility(GONE);
+            pitchingResult1Layout.setVisibility(GONE);
+            pitchingResult2Layout.setVisibility(GONE);
+            pitchingResult3Layout.setVisibility(GONE);
+            pitchingResult4Layout.setVisibility(GONE);
+            pitchingResult5Layout.setVisibility(GONE);
         } else {
             pitchingTitleLayout.setVisibility(View.VISIBLE);
             pitchingResult1Layout.setVisibility(View.VISIBLE);
@@ -138,7 +191,7 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
             pitchingResult3Layout.setVisibility(View.VISIBLE);
             pitchingResult4Layout.setVisibility(View.VISIBLE);
             if(targetGameResult.getTamakazu() == GameResult.TAMAKAZU_NONE) {
-                pitchingResult5Layout.setVisibility(View.GONE);
+                pitchingResult5Layout.setVisibility(GONE);
             } else {
                 pitchingResult5Layout.setVisibility(View.VISIBLE);
             }
@@ -174,8 +227,8 @@ public class ShowGameResultActivity extends CommonAdsActivity implements View.On
         TextView memoText = (TextView)findViewById(R.id.memo_text);
 
         if("".equals(memo)){
-            memoTitleLayout.setVisibility(LinearLayout.GONE);
-            memoLayout.setVisibility(LinearLayout.GONE);
+            memoTitleLayout.setVisibility(GONE);
+            memoLayout.setVisibility(GONE);
         } else {
             memoTitleLayout.setVisibility(LinearLayout.VISIBLE);
             memoLayout.setVisibility(LinearLayout.VISIBLE);

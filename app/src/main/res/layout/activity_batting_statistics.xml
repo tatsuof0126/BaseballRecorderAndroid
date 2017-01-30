@@ -55,7 +55,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Medium Text"
+                        android:text="すべて"
                         android:id="@+id/time" />
                 </LinearLayout>
 
@@ -75,7 +75,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Medium Text"
+                        android:text="すべて"
                         android:id="@+id/team" />
                 </LinearLayout>
 
@@ -314,7 +314,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="盗塁"
+                        android:text="犠飛"
                         android:id="@+id/textView42"
                         android:layout_weight="0.2" />
 
@@ -323,7 +323,65 @@
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:text="0"
+                        android:id="@+id/sacrificefly"
+                        android:gravity="center_horizontal"
+                        android:layout_weight="0.15" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="20dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="盗塁"
+                        android:id="@+id/textView39"
+                        android:layout_weight="0.2" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="0"
                         android:id="@+id/steal"
+                        android:gravity="center_horizontal"
+                        android:layout_weight="0.15" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="盗塁死"
+                        android:id="@+id/textView41"
+                        android:layout_weight="0.2" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="0"
+                        android:id="@+id/stealout"
+                        android:gravity="center_horizontal"
+                        android:layout_weight="0.15" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="失策"
+                        android:id="@+id/textView43"
+                        android:layout_weight="0.2" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="0"
+                        android:id="@+id/error"
                         android:gravity="center_horizontal"
                         android:layout_weight="0.15" />
                 </LinearLayout>
@@ -338,7 +396,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Medium Text"
+                        android:text="打率 .333  出塁率 .444  長打率 .555"
                         android:id="@+id/stats1" />
                 </LinearLayout>
 
@@ -352,7 +410,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Medium Text"
+                        android:text="OPS .333  IsoD .444  IsoP .555"
                         android:id="@+id/stats2" />
                 </LinearLayout>
 
@@ -366,7 +424,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Medium Text"
+                        android:text="盗塁成功率 .888  RC27 5.00"
                         android:id="@+id/stats3" />
                 </LinearLayout>
 

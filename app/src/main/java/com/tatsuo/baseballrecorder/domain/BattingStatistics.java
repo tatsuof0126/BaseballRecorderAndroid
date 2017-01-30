@@ -21,6 +21,9 @@ public class BattingStatistics {
     private int daten;
     private int tokuten;
     private int steal;
+    private int stealOut;
+    private int error;
+    private int doubleplay;
 
     private float average;
     private float obp;
@@ -29,6 +32,7 @@ public class BattingStatistics {
     private float isod;
     private float isop;
     private float rc27;
+    private float stealrate;
 
     public int getHits() {
         return hits;
@@ -142,6 +146,18 @@ public class BattingStatistics {
         this.steal = steal;
     }
 
+    public int getStealOut() { return stealOut; }
+
+    public void setStealOut(int stealOut) { this.stealOut = stealOut; }
+
+    public int getError() { return error; }
+
+    public void setError(int error) { this.error = error; }
+
+    public int getDoubleplay() { return doubleplay; }
+
+    public void setDoubleplay(int doubleplay) { this.doubleplay = doubleplay; }
+
     public float getAverage() {
         return average;
     }
@@ -198,6 +214,10 @@ public class BattingStatistics {
         this.rc27 = rc27;
     }
 
+    public float getStealrate() { return stealrate; }
+
+    public void setStealrate(float stealrate) { this.stealrate = stealrate; }
+
     public static BattingStatistics calculateBattingStatistics(List<GameResult> gameResultList){
         BattingStatistics battingStatistics = new BattingStatistics();
 
@@ -214,11 +234,14 @@ public class BattingStatistics {
                 battingStatistics.walks    += battingResult.getStatisticsCounts(BattingResult.TYPE_WALKS);
                 battingStatistics.sacrifices += battingResult.getStatisticsCounts(BattingResult.TYPE_SACRIFICES);
                 battingStatistics.sacrificeflies += battingResult.getStatisticsCounts(BattingResult.TYPE_SACRIFICEFLIES);
+                battingStatistics.doubleplay += battingResult.getStatisticsCounts(BattingResult.TYPE_DOUBLEPLAY);
             }
 
             battingStatistics.daten += gameResult.getDaten();
             battingStatistics.tokuten += gameResult.getTokuten();
             battingStatistics.steal += gameResult.getSteal();
+            battingStatistics.stealOut += gameResult.getStealOut();
+            battingStatistics.error += gameResult.getError();
         }
 
         battingStatistics.calculateStatistics();
@@ -251,11 +274,15 @@ public class BattingStatistics {
         // 出塁機会C = 打数 + 四球 + 死球 + 犠飛 + 犠打
         // RC =（A+2.4×C）×（B+3×C）÷(9×C)－0.9×C
         // RC27 = RC÷（打数－安打＋盗塁死＋犠打＋犠飛＋併殺打）×27
-        float a = hits + walks; // TODO 盗塁死を併殺打を引く
+        float a = hits + walks - stealOut - doubleplay;
         float b = (float)((singles+doubles*2+triples*3+homeruns*4) + walks*0.26 + sacrifices*0.53 + steal*0.64 - strikeouts*0.03);
         float c = atbats + walks + sacrifices;
         float rc = (float)((a+2.4*c) * (b+3*c) / (9*c) - 0.9*c);
-        rc27 = rc / (float)(atbats - hits + sacrifices) * 27; // TODO 盗塁死を併殺打を加える
+        rc27 = rc / (float)(atbats - hits + sacrifices + stealOut + doubleplay) * 27;
+
+        // 盗塁成功率＝盗塁÷（盗塁＋盗塁死）
+        stealrate = (float)steal / (float)(steal + stealOut);
+
     }
 
 }

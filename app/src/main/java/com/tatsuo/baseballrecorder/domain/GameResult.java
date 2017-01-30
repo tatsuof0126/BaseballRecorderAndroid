@@ -10,6 +10,8 @@ import java.util.UUID;
  */
 public class GameResult implements Serializable {
 
+    private static final int RESULT_VERSION = 8;
+
     private String uuid;
     private int resultId;
     private int year;
@@ -23,6 +25,14 @@ public class GameResult implements Serializable {
     private int daten;
     private int tokuten;
     private int steal;
+    private int stealOut;
+    private int error;
+    private int dajun;
+    private int shubi1;
+    private int shubi2;
+    private int shubi3;
+    private int seme;
+
     private String memo;
     private List<BattingResult> battingResultList;
 
@@ -41,6 +51,19 @@ public class GameResult implements Serializable {
 
     public static final int NON_REGISTED = -999;
     public static final int TAMAKAZU_NONE = -999;
+
+    public static final String[] DAJUN_SPINNER = {"(未設定)", "1番", "2番", "3番", "4番", "5番", "6番", "7番", "8番", "9番",
+            "10番", "11番", "12番", "代打", "代走", "守備交代"};
+    public static final String[] DAJUN_STRING = {"", "1番", "2番", "3番", "4番", "5番", "6番", "7番", "8番", "9番",
+            "10番", "11番", "12番", "代打", "代走", "守備交代"};
+
+    public static final String[] SHUBI_SPINNER = {"(未設定)", "ピッチャー", "キャッチャー", "ファースト", "セカンド", "サード", "ショート",
+            "レフト", "センター", "ライト", "指名打者"};
+    public static final String[] SHUBI_SHORT_SPINNER = {"(未)", "投手", "捕手", "一塁", "二塁", "三塁", "遊撃", "左翼", "中堅", "右翼", "指名"};
+
+    public static final String[] SHUBI_STRING = {"", "ピッチャー", "キャッチャー", "ファースト", "セカンド", "サード", "ショート",
+            "レフト", "センター", "ライト", "指名打者"};
+    public static final String[] SHUBI_SHORT_STRING = {"", "投手", "捕手", "一塁", "二塁", "三塁", "遊撃", "左翼", "中堅", "右翼", "指名"};
 
     public static final String[] INNING = {"","1回","2回","3回","4回","5回","6回","7回","8回","9回","10回","11回","12回"};
     public static final String[] INNING2 = {"","0/3","1/3","2/3"};
@@ -186,6 +209,34 @@ public class GameResult implements Serializable {
         this.steal = steal;
     }
 
+    public int getStealOut() { return stealOut; }
+
+    public void setStealOut(int stealOut) { this.stealOut = stealOut; }
+
+    public int getSeme() { return seme; }
+
+    public void setSeme(int seme) { this.seme = seme; }
+
+    public int getShubi3() { return shubi3; }
+
+    public void setShubi3(int shubi3) { this.shubi3 = shubi3; }
+
+    public int getShubi2() { return shubi2; }
+
+    public void setShubi2(int shubi2) { this.shubi2 = shubi2; }
+
+    public int getShubi1() { return shubi1; }
+
+    public void setShubi1(int shubi1) { this.shubi1 = shubi1; }
+
+    public int getDajun() { return dajun; }
+
+    public void setDajun(int dajun) { this.dajun = dajun; }
+
+    public int getError() { return error; }
+
+    public void setError(int error) { this.error = error; }
+
     public String getMemo() {
         return memo;
     }
@@ -299,6 +350,17 @@ public class GameResult implements Serializable {
     }
 
     public String getGameResultString(){
+        if(RESULT_VERSION == 7){
+            return getGameResultStringV7();
+        } else if(RESULT_VERSION == 8){
+            return getGameResultStringV8();
+        }
+
+        // デフォルトはV8
+        return getGameResultStringV8();
+    }
+
+    private String getGameResultStringV7(){
         StringBuilder resultString = new StringBuilder();
 
         if("".equals(uuid) == true){
@@ -335,11 +397,63 @@ public class GameResult implements Serializable {
         return resultString.toString();
     }
 
+    private String getGameResultStringV8(){
+        StringBuilder resultString = new StringBuilder();
+
+        if("".equals(uuid) == true){
+            // UUIDを作成
+            uuid = UUID.randomUUID().toString();
+        }
+
+        // １行目：ファイル形式バージョン（V7）、UUID
+        resultString.append("V8,"+uuid+"\n");
+
+        // ２行目：試合情報（ID、年、月、日、場所、自チーム、相手チーム、自チーム得点、相手チーム得点、打点、得点、盗塁、盗塁死、失策、先攻後攻、打順、守備位置１、守備位置２、守備位置３）
+        resultString.append(resultId+","+year+","+month+","+day+","+place+","+myteam+","+otherteam+","
+                +myscore+","+otherscore+","+daten+","+tokuten+","+steal+","+stealOut+","+error+","+seme+","+
+                dajun+","+shubi1+","+shubi2+","+shubi3+"\n");
+
+        // ３行目：タグ（カンマ区切り）
+        resultString.append("\n"); // 今のところ空
+
+        // ４行目：打撃成績（場所、結果、場所、結果・・・・）
+        for(BattingResult battingResult : battingResultList){
+            resultString.append(battingResult.getPosition()+","+battingResult.getResult()+",");
+        }
+        if(battingResultList.size() > 0) {
+            resultString.deleteCharAt(resultString.lastIndexOf(","));
+        }
+        resultString.append("\n");
+
+        // ５行目：投手成績（投球回、投球回小数点以下、安打、本塁打、奪三振、与四球、与死球、失点、自責点、完投、責任投手、投球数）
+        resultString.append(inning+","+inning2+","+hianda+","+hihomerun+","+dassanshin+","+yoshikyu+","+yoshikyu2+","
+                +shitten+","+jisekiten+","+( kanto ? 1 : 0 )+","+sekinin+","+tamakazu+"\n");
+
+        // ６行目以降：メモ
+        resultString.append(memo);
+
+        return resultString.toString();
+    }
+
     public static GameResult makeGameResult(String string){
+        // バージョン情報を取得
+        String[] stringList = string.split(",", -1);
+        String version = stringList[0];
+
+        if("V7".equals(version)){
+            return makeGameResultV7(string);
+        } else if ("V8".equals(version)){
+            return makeGameResultV8(string);
+        }
+
+        // 不明の場合はV8
+        return makeGameResultV8(string);
+    }
+
+    private static GameResult makeGameResultV7(String string) {
         GameResult gameResult = new GameResult();
 
         try {
-
             String[] stringList = string.split("\n", -1);
 
             // １行目：ファイル形式バージョン（V7）、UUID
@@ -360,6 +474,90 @@ public class GameResult implements Serializable {
             gameResult.setDaten(Integer.parseInt(stringList2[9]));
             gameResult.setTokuten(Integer.parseInt(stringList2[10]));
             gameResult.setSteal(Integer.parseInt(stringList2[11]));
+
+            // ３行目：タグ（カンマ区切り）
+            // とりあえずスルー
+
+            // ４行目：打撃成績（場所、結果、場所、結果・・・・）
+            List<BattingResult> battingResultList = new ArrayList<BattingResult>();
+            String[] stringList4 = stringList[3].split(",", -1);
+            for (int i = 0; i < stringList4.length / 2; i++) {
+                BattingResult battingResult = new BattingResult();
+                battingResult.setPosition(Integer.parseInt(stringList4[i * 2]));
+                battingResult.setResult(Integer.parseInt(stringList4[i * 2 + 1]));
+                battingResultList.add(battingResult);
+            }
+            gameResult.setBattingResultList(battingResultList);
+
+            // ５行目：投手成績（投球回、投球回小数点以下、安打、本塁打、奪三振、与四球、与死球、失点、自責点、完投、責任投手、投球数）
+            String[] stringList5 = stringList[4].split(",", -1);
+            if (stringList5.length >= 12) {
+                gameResult.setInning(Integer.parseInt(stringList5[0]));
+                gameResult.setInning2(Integer.parseInt(stringList5[1]));
+                gameResult.setHianda(Integer.parseInt(stringList5[2]));
+                gameResult.setHihomerun(Integer.parseInt(stringList5[3]));
+                gameResult.setDassanshin(Integer.parseInt(stringList5[4]));
+                gameResult.setYoshikyu(Integer.parseInt(stringList5[5]));
+                gameResult.setYoshikyu2(Integer.parseInt(stringList5[6]));
+                gameResult.setShitten(Integer.parseInt(stringList5[7]));
+                gameResult.setJisekiten(Integer.parseInt(stringList5[8]));
+                gameResult.setKanto(Integer.parseInt(stringList5[9]) == 1);
+                gameResult.setSekinin(Integer.parseInt(stringList5[10]));
+                gameResult.setTamakazu(Integer.parseInt(stringList5[11]));
+            }
+
+            // ６行目以降：メモ
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 5; i < stringList.length; i++) {
+                stringBuilder.append(stringList[i]);
+                // 最終行じゃないなら改行を足す
+                if (i != stringList.length - 1) {
+                    stringBuilder.append("\n");
+                }
+            }
+            gameResult.setMemo(stringBuilder.toString());
+
+        } catch (Exception e) {
+            // 読み込みに失敗したらNULLを返す
+            e.printStackTrace();
+            gameResult = null;
+        }
+
+        return gameResult;
+    }
+
+    private static GameResult makeGameResultV8(String string) {
+        GameResult gameResult = new GameResult();
+
+        try {
+
+            String[] stringList = string.split("\n", -1);
+
+            // １行目：ファイル形式バージョン（V8）、UUID
+            String[] stringList1 = stringList[0].split(",", -1);
+            gameResult.setUuid(stringList1[1]);
+
+            // ２行目：試合情報（ID、年、月、日、場所、自チーム、相手チーム、自チーム得点、相手チーム得点、打点、得点、盗塁、盗塁死、失策、先攻後攻、打順、守備位置１、守備位置２、守備位置３）
+            String[] stringList2 = stringList[1].split(",", -1);
+            gameResult.setResultId(Integer.parseInt(stringList2[0]));
+            gameResult.setYear(Integer.parseInt(stringList2[1]));
+            gameResult.setMonth(Integer.parseInt(stringList2[2]));
+            gameResult.setDay(Integer.parseInt(stringList2[3]));
+            gameResult.setPlace(stringList2[4]);
+            gameResult.setMyteam(stringList2[5]);
+            gameResult.setOtherteam(stringList2[6]);
+            gameResult.setMyscore(Integer.parseInt(stringList2[7]));
+            gameResult.setOtherscore(Integer.parseInt(stringList2[8]));
+            gameResult.setDaten(Integer.parseInt(stringList2[9]));
+            gameResult.setTokuten(Integer.parseInt(stringList2[10]));
+            gameResult.setSteal(Integer.parseInt(stringList2[11]));
+            gameResult.setStealOut(Integer.parseInt(stringList2[12]));
+            gameResult.setError(Integer.parseInt(stringList2[13]));
+            gameResult.setSeme(Integer.parseInt(stringList2[14]));
+            gameResult.setDajun(Integer.parseInt(stringList2[15]));
+            gameResult.setShubi1(Integer.parseInt(stringList2[16]));
+            gameResult.setShubi2(Integer.parseInt(stringList2[17]));
+            gameResult.setShubi3(Integer.parseInt(stringList2[18]));
 
             // ３行目：タグ（カンマ区切り）
             // とりあえずスルー
