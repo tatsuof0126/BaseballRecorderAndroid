@@ -1,11 +1,17 @@
 package com.tatsuo.baseballrecorder;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,8 +39,11 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
 
     private IabHelper iabHelper;
     private boolean purchasedRemoveAds = false;
+    private boolean purchasedUseMigrationCd = false;
 
     private static final String PRODUCT_ID_REMOVE_ADS = "remove_ads";
+    private static final String PRODUCT_ID_USE_MIGRATION_CD = "use_migration_cd";
+
     private static final String BASE64_ENCODED_PUBLIC_KEY
             = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApNlSgcpuQwmm6kLppz6n+lc1bcmsQHhq3A9/hywZ630F+oXuKOOkT3kj7xs8tGg9F77GUJhCTCtgPnfZj9JCTiqFSS8mg/OyPvkgQKr21Bs9C5VZmk67zhb3zVJbWqCUNS5NkNK6aD92vTGh/gBiBy9Z6HMAwrCqLPxg/hFISO1rWavnHijb5hLsz4au6DA/Y42SylMht0EzB6Zs3IpcGp6XGQmu+NN6pYNghCX5BxzVBPxk0e933qQBqB9rLwI0NuthxFd1bQK0Pn0lttQ2GTvXBiBiotQheu1aJwW9ds8JJM0g8nL3ty1hpdYHtiCj5rlKlGOPihJSE/wCKhpOxwIDAQAB";
 
@@ -46,9 +55,14 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
         Button removeAdsButton = (Button)findViewById(R.id.remove_ads_button);
         removeAdsButton.setOnClickListener(this);
 
-        TextView removeAdsText = (TextView)findViewById(R.id.removed_ads);
+        Button saveServerButton = (Button)findViewById(R.id.save_server_button);
+        saveServerButton.setOnClickListener(this);
 
-        if(ConfigManager.isShowAds() == true) {
+        Button loadServerButton = (Button)findViewById(R.id.load_server_button);
+        loadServerButton.setOnClickListener(this);
+
+        // 未購入のアドオンがあればIabHelperをセットアップ
+        if(ConfigManager.isShowAds() == true || ConfigManager.isUseMigrationCd() == false) {
             iabHelper = new IabHelper(this, BASE64_ENCODED_PUBLIC_KEY);
             iabHelper.enableDebugLogging(true);
             iabHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
@@ -56,22 +70,20 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
                 public void onIabSetupFinished(IabResult result) {
                     if (!result.isSuccess()) {
                         // 失敗した時の処理
-                        // Log.e("IAB", "セットアップ失敗");
+                        Log.e("IAB", "セットアップ失敗");
                         return;
                     }
 
-                    // Log.e("IAB", "セットアップ成功。購入済みアイテムを取得する");
+                    Log.e("IAB", "セットアップ成功。購入済みアイテムを取得する");
                     iabHelper.queryInventoryAsync(inventoryListener);
                 }
             });
-            removeAdsButton.setVisibility(View.VISIBLE);
-            removeAdsText.setVisibility(View.GONE);
-        } else {
-            removeAdsButton.setVisibility(View.GONE);
-            removeAdsText.setVisibility(View.VISIBLE);
+
         }
 
         makeConfigView();
+
+        makeAdsButtonView();
 
         makeAdsView();
     }
@@ -95,7 +107,7 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
                 ViewGroup.LayoutParams.MATCH_PARENT, viewHeight));
     }
 
-    protected void makeConfigView() {
+    private void makeConfigView() {
         boolean calc7Flg = ConfigManager.loadCalc7Flg();
         CheckBox calc7Check = (CheckBox)findViewById(R.id.calc7_check);
         calc7Check.setChecked(calc7Flg);
@@ -119,6 +131,19 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
         TextView versionText = (TextView)findViewById(R.id.version_text);
         versionText.setText("草野球日記 ベボレコ ver" + versionName);
 
+    }
+
+    private void makeAdsButtonView() {
+        Button removeAdsButton = (Button)findViewById(R.id.remove_ads_button);
+        TextView removeAdsText = (TextView)findViewById(R.id.removed_ads);
+
+        if(ConfigManager.isShowAds() == true) {
+            removeAdsButton.setVisibility(View.VISIBLE);
+            removeAdsText.setVisibility(View.GONE);
+        } else {
+            removeAdsButton.setVisibility(View.GONE);
+            removeAdsText.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -147,21 +172,24 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
     public void onClick(View v){
         switch (v.getId()) {
             case R.id.remove_ads_button:
-                removeAds();
+                purchaseRemoveAds();
+                break;
+            case R.id.save_server_button:
+                moveSaveServerActivity();
+                break;
+            case R.id.load_server_button:
+                checkUseMigrationCd();
                 break;
         }
     }
 
-    private void removeAds(){
+    private void purchaseRemoveAds(){
         if(purchasedRemoveAds == true){
             // 広告削除を購入済みだった場合、広告表示を消す
-            // Log.e("IAB", "広告削除を購入済みです。");
+            Log.e("IAB", "広告削除を購入済みです。");
             ConfigManager.saveShowAds(false);
-            Button removeAdsButton = (Button)findViewById(R.id.remove_ads_button);
-            TextView removeAdsText = (TextView)findViewById(R.id.removed_ads);
-            removeAdsButton.setVisibility(View.GONE);
-            removeAdsText.setVisibility(View.VISIBLE);
 
+            makeAdsButtonView();
             adjustViewHeight();
 
             Utility.showAlertDialog(this, "すでに広告削除を購入済みであることが確認できたため広告を削除します。");
@@ -178,72 +206,103 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
             iabHelper.launchPurchaseFlow(this, PRODUCT_ID_REMOVE_ADS, 10001, purchaseFinishedListener, "12345678");
         } catch(Exception e){
             Utility.showAlertDialog(this, "購入手続きを開始できません。端末にGoogleIDが設定されていることを確認の上、しばらくしてから再度お試しください。");
-            // Log.e("IAB","Exception",e);
+            Log.e("IAB", "Exception", e);
         }
 
     }
 
+    private void purchaseUseMigrationCd(){
+        // 機種変更コード利用の購入手続き
+        try {
+            List additionalSkuList = new ArrayList();
+            additionalSkuList.add(PRODUCT_ID_USE_MIGRATION_CD);
+            Inventory inventory = iabHelper.queryInventory(true, additionalSkuList);
+            inventory.getSkuDetails(PRODUCT_ID_USE_MIGRATION_CD).getPrice();
+
+            iabHelper.launchPurchaseFlow(this, PRODUCT_ID_USE_MIGRATION_CD, 10002, purchaseFinishedListener, "87654321");
+        } catch(Exception e){
+            Utility.showAlertDialog(this, "購入手続きを開始できません。端末にGoogleIDが設定されていることを確認の上、しばらくしてから再度お試しください。");
+            Log.e("IAB", "Exception", e);
+        }
+    }
+
+
     // 購入済みアイテムの取得結果の受け取り用メソッドを作成
     IabHelper.QueryInventoryFinishedListener inventoryListener = new IabHelper.QueryInventoryFinishedListener() {
         public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-            // Log.e("IAB", "購入済みアイテムの取得完了");
+            Log.e("IAB", "購入済みアイテムの取得完了");
 
             if (iabHelper == null) {
                 return;
             }
 
             if (result.isFailure()) {
-                // Log.e("IAB", "購入済みアイテムの取得失敗");
+                Log.e("IAB", "購入済みアイテムの取得失敗");
                 return;
             }
 
-            // Log.e("IAB", "購入済みアイテムの取得成功");
+            Log.e("IAB", "購入済みアイテムの取得成功");
 
             // 購入済みアイテムの確認
-            Purchase purchase = inventory.getPurchase(PRODUCT_ID_REMOVE_ADS);
-            if (purchase != null) {
+            Purchase purchaseAds = inventory.getPurchase(PRODUCT_ID_REMOVE_ADS);
+            if (purchaseAds != null) {
                 purchasedRemoveAds = true;
-                // Log.e("IAB", "商品を購入済みです。");
+                Log.e("IAB", "「広告削除」を購入済みです。");
 
                 // テストコード・購入済みを解除
-                // iabHelper.consumeAsync(purchase, consumeFinishedListener);
+                // iabHelper.consumeAsync(purchaseAds, consumeFinishedListener);
             }
+
+            Purchase purchaseMig = inventory.getPurchase(PRODUCT_ID_USE_MIGRATION_CD);
+            if (purchaseMig != null) {
+                purchasedUseMigrationCd = true;
+                Log.e("IAB", "「機種変更コード利用」を購入済みです。");
+            }
+
         }
     };
 
     // 購入結果の受け取り用メソッド
     IabHelper.OnIabPurchaseFinishedListener purchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
         public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
-            // Log.e("IAB", "購入完了 result:" + result + ", purchase: " + purchase);
+            Log.e("IAB", "購入完了 result:" + result + ", purchase: " + purchase);
 
             if (iabHelper == null){
                 return;
             }
 
             if (result.isFailure()) {
-                // Log.e("IAB","購入失敗");
+                Log.e("IAB","購入失敗");
                 Utility.showAlertDialog(ConfigActivity.this, "購入手続きに失敗しました。しばらくしてから再度お試しください。");
                 return;
             }
 
-            // Log.e("IAB", "購入成功");
+            Log.e("IAB", "購入成功 : "+purchase.getSku());
 
             if (purchase.getSku().equals(PRODUCT_ID_REMOVE_ADS)) {
-                // Log.e("IAB", "あなたの商品：" + PRODUCT_ID_REMOVE_ADS + "を購入しました。");
-                // Log.e("IAB","orderIdは：" + purchase.getOrderId());
-                // Log.e("IAB", "INAPP_PURCHASE_DATAのJSONは：" + purchase.getOriginalJson());
+                Log.e("IAB", "あなたの商品：" + PRODUCT_ID_REMOVE_ADS + "を購入しました。");
+                Log.e("IAB", "orderIdは：" + purchase.getOrderId());
+                Log.e("IAB", "INAPP_PURCHASE_DATAのJSONは：" + purchase.getOriginalJson());
                 
                 // 広告表示を消す
                 ConfigManager.saveShowAds(false);
-                Button removeAdsButton = (Button)findViewById(R.id.remove_ads_button);
-                TextView removeAdsText = (TextView)findViewById(R.id.removed_ads);
-                removeAdsButton.setVisibility(View.GONE);
-                removeAdsText.setVisibility(View.VISIBLE);
 
+                makeAdsButtonView();
                 adjustViewHeight();
 
                 Utility.showAlertDialog(ConfigActivity.this, "広告削除を購入しました。広告を削除します。");
             }
+
+            if (purchase.getSku().equals(PRODUCT_ID_USE_MIGRATION_CD)) {
+                Log.e("IAB", "あなたの商品：" + PRODUCT_ID_USE_MIGRATION_CD + "を購入しました。");
+                Log.e("IAB", "orderIdは：" + purchase.getOrderId());
+                Log.e("IAB", "INAPP_PURCHASE_DATAのJSONは：" + purchase.getOriginalJson());
+
+                // 機種変更コード利用をONにする
+                ConfigManager.setUseMigrationCd(true);
+                Utility.showAlertDialog(ConfigActivity.this, "機種変更コード利用アドオンを購入しました。機種変更コードが利用できるようになりました。");
+            }
+
         }
     };
 
@@ -261,6 +320,52 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
         }
     };
     */
+
+    public static class CustomDialogFragment extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final ConfigActivity activity = (ConfigActivity)getActivity();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            // builder.setTitle("");
+            builder.setMessage("機種変更コードを使うにはアドオンの入手が必要です。");
+            builder.setPositiveButton("アドオン入手", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    activity.purchaseUseMigrationCd();
+                }
+            });
+            builder.setNegativeButton("キャンセル", null);
+
+            AlertDialog dialog = builder.create();
+            return dialog;
+        }
+    }
+
+    private void checkUseMigrationCd(){
+        // すでに機種変更コードを購入済みだった場合はフラグをONする
+        if(purchasedUseMigrationCd == true){
+            ConfigManager.setUseMigrationCd(true);
+        }
+
+        if(ConfigManager.isUseMigrationCd()){
+            moveLoadServerActivity();
+        } else {
+            FragmentManager manager = getFragmentManager();
+            CustomDialogFragment dialog = new CustomDialogFragment();
+            dialog.show(manager, "dialog");
+        }
+    }
+
+    private void moveSaveServerActivity(){
+        Intent intent = new Intent(this, SaveServerActivity.class);
+        startActivity(intent);
+    }
+
+    private void moveLoadServerActivity(){
+        Intent intent = new Intent(this, LoadServerActivity.class);
+        startActivity(intent);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

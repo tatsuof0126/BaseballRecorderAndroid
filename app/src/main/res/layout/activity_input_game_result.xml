@@ -306,7 +306,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/dajunspinner"
-                        app:spinnerMode="dialog"
+                        android:spinnerMode="dialog"
                         android:elevation="8dp" />
 
                     <Space
@@ -339,7 +339,7 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/shubi1spinner"
                         android:layout_weight="1"
-                        app:spinnerMode="dialog" />
+                        android:spinnerMode="dialog" />
 
                     <Space
                         android:layout_width="10dp"
@@ -353,7 +353,7 @@
                         android:layout_weight="1"
                         android:elevation="11dp"
                         android:visibility="visible"
-                        app:spinnerMode="dialog" />
+                        android:spinnerMode="dialog" />
 
                     <Space
                         android:layout_width="10dp"
@@ -367,7 +367,7 @@
                         android:layout_weight="1"
                         android:elevation="11dp"
                         android:visibility="gone"
-                        app:spinnerMode="dialog" />
+                        android:spinnerMode="dialog" />
 
                 </LinearLayout>
 

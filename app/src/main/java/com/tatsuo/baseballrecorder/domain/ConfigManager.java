@@ -6,6 +6,8 @@ import android.preference.PreferenceManager;
 
 import com.tatsuo.baseballrecorder.BaseballRecorderApplication;
 
+import java.util.Date;
+
 /**
  * Created by tatsuo on 2015/08/23.
  */
@@ -97,6 +99,115 @@ public class ConfigManager {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         editor.putBoolean("SHOW_ADS", showAds);
+        editor.commit();
+    }
+
+    public static boolean isUseMigrationCd(){
+        Context context = BaseballRecorderApplication.getInstance();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getBoolean("USE_MIGRATION_CD", false);
+    }
+
+    public static void setUseMigrationCd(boolean useMigrationCd){
+        Context context = BaseballRecorderApplication.getInstance();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putBoolean("USE_MIGRATION_CD", useMigrationCd);
+        editor.commit();
+    }
+
+    public static String getLastMigrationCd(){
+        Context context = BaseballRecorderApplication.getInstance();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getString("MIGRATION_CD","");
+    }
+
+    public static void setLastMigrationCd(String lastMigrationCd){
+        Context context = BaseballRecorderApplication.getInstance();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString("MIGRATION_CD", lastMigrationCd);
+        editor.commit();
+    }
+
+    public static Date getLastMigrationDate(){
+        Context context = BaseballRecorderApplication.getInstance();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        long migrationDateLong = sharedPreferences.getLong("MIGRATION_DATE",0);
+        if(migrationDateLong == 0){
+            return null;
+        }
+
+        return new Date(migrationDateLong);
+    }
+
+    public static void setLastMigrationDate(Date lastMigrationDate){
+        Context context = BaseballRecorderApplication.getInstance();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putLong("MIGRATION_DATE", lastMigrationDate.getTime());
+        editor.commit();
+    }
+
+    public static int getMigrationCount(){
+        Context context = BaseballRecorderApplication.getInstance();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return sharedPreferences.getInt("MIGRATION_COUNT", 0);
+    }
+
+    public static void setMigrationCount(int count){
+        Context context = BaseballRecorderApplication.getInstance();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putInt("MIGRATION_COUNT", count);
+        editor.commit();
+    }
+
+    public static String getS3Info(){
+        Context context = BaseballRecorderApplication.getInstance();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getString("S3INFO","");
+    }
+
+    public static void setS3Info(String s3Info){
+        Context context = BaseballRecorderApplication.getInstance();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString("S3INFO", s3Info);
+        editor.commit();
+    }
+
+    public static Date getS3InfoUpdateDate(){
+        Context context = BaseballRecorderApplication.getInstance();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        long migrationDateLong = sharedPreferences.getLong("S3INFOUPDATEDATE",0);
+        if(migrationDateLong == 0){
+            return null;
+        }
+
+        return new Date(migrationDateLong);
+    }
+
+    public static void setS3InfoUpdateDate(Date updateDate){
+        Context context = BaseballRecorderApplication.getInstance();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putLong("S3INFOUPDATEDATE", updateDate.getTime());
         editor.commit();
     }
 

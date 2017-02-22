@@ -7,9 +7,13 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.view.View;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by tatsuo on 2015/08/15.
@@ -94,6 +98,52 @@ public class Utility {
         builder.setMessage(message);
         builder.setPositiveButton("OK", null);
         builder.show();
+    }
+
+    public static String getStringFromFile(String filePath){
+        if(filePath == null || "".equals(filePath)){
+            return null;
+        }
+
+        File file = new File(filePath);
+        if(file.exists() == false){
+            return null;
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(new File(filePath)));
+            String string = null;
+            while ((string = reader.readLine()) != null) {
+                stringBuilder.append(string);
+                stringBuilder.append("\n");
+            }
+        } catch (IOException ioe){
+            return null;
+        } finally {
+            try {
+                if(reader != null) {
+                    reader.close();
+                }
+            } catch (IOException ioe){}
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public static boolean isToday(Date date){
+        Calendar nowCal = Calendar.getInstance();
+        Calendar checkCal = Calendar.getInstance();
+        checkCal.setTimeInMillis(date.getTime());
+
+        if(nowCal.get(Calendar.YEAR) == checkCal.get(Calendar.YEAR) &&
+                nowCal.get(Calendar.MONTH) == checkCal.get(Calendar.MONTH) &&
+                nowCal.get(Calendar.DAY_OF_MONTH) == checkCal.get(Calendar.DAY_OF_MONTH)) {
+            return true;
+        }
+        return false;
     }
 
 }

@@ -8,11 +8,13 @@
     <string name="title_activity_batting_analysis">打撃分析</string>
     <string name="title_activity_pitching_statistics">投手成績</string>
     <string name="title_activity_config">設定</string>
+    <string name="title_activity_save_server">機種変更コードを発行</string>
+    <string name="title_activity_load_server">機種変更コードを使う</string>
 
     <!-- 本番 -->
-    <!-- <string name="banner_ad_unit_id">ca-app-pub-6719193336347757/5014225053</string> -->
+    <string name="banner_ad_unit_id">ca-app-pub-6719193336347757/5014225053</string>
     <!-- テスト用 -->
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <!-- <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string> -->
 
     <string name="hello_world">hello_world</string>
     <string name="action_settings">hello_world</string>

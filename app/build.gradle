@@ -9,8 +9,8 @@ android {
             storePassword 'tfujiwar'
         }
     }
-    compileSdkVersion 22
-    buildToolsVersion '22.0.1'
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
     defaultConfig {
         applicationId "com.tatsuo.baseballrecorder"
         minSdkVersion 15
@@ -30,7 +30,9 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:22.2.1'
+    compile 'com.android.support:appcompat-v7:25.1.1'
     compile 'com.google.android.gms:play-services:7.5.0'
+    compile 'com.amazonaws:aws-android-sdk-core:2.2.+'
+    compile 'com.amazonaws:aws-android-sdk-s3:2.2.+'
     compile fileTree(include: ['*.jar'], dir: 'libs')
 }
