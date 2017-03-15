@@ -12,6 +12,7 @@ public class GameResult implements Serializable {
 
     private static final int RESULT_VERSION = 8;
 
+    private String version;
     private String uuid;
     private int resultId;
     private int year;
@@ -59,11 +60,11 @@ public class GameResult implements Serializable {
 
     public static final String[] SHUBI_SPINNER = {"(未設定)", "ピッチャー", "キャッチャー", "ファースト", "セカンド", "サード", "ショート",
             "レフト", "センター", "ライト", "指名打者"};
-    public static final String[] SHUBI_SHORT_SPINNER = {"(未)", "投手", "捕手", "一塁", "二塁", "三塁", "遊撃", "左翼", "中堅", "右翼", "指名"};
+    public static final String[] SHUBI_SHORT_SPINNER = {"(未)", "投手", "捕手", "一塁", "二塁", "三塁", "遊撃", "左翼", "中堅", "右翼", "DH"};
 
     public static final String[] SHUBI_STRING = {"", "ピッチャー", "キャッチャー", "ファースト", "セカンド", "サード", "ショート",
             "レフト", "センター", "ライト", "指名打者"};
-    public static final String[] SHUBI_SHORT_STRING = {"", "投手", "捕手", "一塁", "二塁", "三塁", "遊撃", "左翼", "中堅", "右翼", "指名"};
+    public static final String[] SHUBI_SHORT_STRING = {"", "投手", "捕手", "一塁", "二塁", "三塁", "遊撃", "左翼", "中堅", "右翼", "DH"};
 
     public static final String[] INNING = {"","1回","2回","3回","4回","5回","6回","7回","8回","9回","10回","11回","12回"};
     public static final String[] INNING2 = {"","0/3","1/3","2/3"};
@@ -103,6 +104,23 @@ public class GameResult implements Serializable {
         kanto = false;
         tamakazu = TAMAKAZU_NONE;
         sekinin = 0;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public boolean isLatestVersion(){
+        String latestVersion = "V"+RESULT_VERSION;
+
+        if(latestVersion.equals(version)){
+            return true;
+        }
+        return false;
     }
 
     public String getUuid() {
@@ -458,6 +476,7 @@ public class GameResult implements Serializable {
 
             // １行目：ファイル形式バージョン（V7）、UUID
             String[] stringList1 = stringList[0].split(",", -1);
+            gameResult.setVersion(stringList1[0]);
             gameResult.setUuid(stringList1[1]);
 
             // ２行目：試合情報（ID、年、月、日、場所、自チーム、相手チーム、自チーム得点、相手チーム得点、打点、得点、盗塁）
@@ -535,6 +554,7 @@ public class GameResult implements Serializable {
 
             // １行目：ファイル形式バージョン（V8）、UUID
             String[] stringList1 = stringList[0].split(",", -1);
+            gameResult.setVersion(stringList1[0]);
             gameResult.setUuid(stringList1[1]);
 
             // ２行目：試合情報（ID、年、月、日、場所、自チーム、相手チーム、自チーム得点、相手チーム得点、打点、得点、盗塁、盗塁死、失策、先攻後攻、打順、守備位置１、守備位置２、守備位置３）

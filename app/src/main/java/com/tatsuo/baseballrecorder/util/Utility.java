@@ -134,6 +134,10 @@ public class Utility {
     }
 
     public static boolean isToday(Date date){
+        if(date == null){
+            return false;
+        }
+
         Calendar nowCal = Calendar.getInstance();
         Calendar checkCal = Calendar.getInstance();
         checkCal.setTimeInMillis(date.getTime());
@@ -143,6 +147,7 @@ public class Utility {
                 nowCal.get(Calendar.DAY_OF_MONTH) == checkCal.get(Calendar.DAY_OF_MONTH)) {
             return true;
         }
+
         return false;
     }
 

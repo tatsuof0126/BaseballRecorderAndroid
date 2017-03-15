@@ -100,9 +100,11 @@ public class SaveServerActivity extends CommonAdsActivity implements View.OnClic
             return;
         }
 
-        // 一度全件を再保存（バージョンを最新化するため）
+        // 最新バージョンでないデータがあれば保存し直し
         for(GameResult gameResult : gameResultList){
-            GameResultManager.saveGameResult(this, gameResult);
+            if(gameResult.isLatestVersion() == false) {
+                GameResultManager.saveGameResult(this, gameResult);
+            }
         }
 
         SaveServerTask task = new SaveServerTask();
@@ -116,7 +118,13 @@ public class SaveServerActivity extends CommonAdsActivity implements View.OnClic
 
             List<String> filelist = S3Manager.S3GetFileList(migrationCdInt+"/");
 
-            if(filelist != null && filelist.size() == 0){
+            // nullが返ってきた場合は通信失敗
+            if(filelist == null){
+                return null;
+            }
+
+            // 空のリストが返ってきた場合はその機種変更コードは使える
+            if(filelist.size() == 0){
                 break;
             }
         }
@@ -129,7 +137,7 @@ public class SaveServerActivity extends CommonAdsActivity implements View.OnClic
         task.execute();
     }
 
-    class SaveServerTask extends AsyncTask<Void, Void, Void> {
+    class SaveServerTask extends AsyncTask<Void, Void, Boolean> {
         private ProgressDialog dialog;
 
         @Override
@@ -141,8 +149,15 @@ public class SaveServerActivity extends CommonAdsActivity implements View.OnClic
         }
 
         @Override
-        protected Void doInBackground(Void... temp) {
+        protected Boolean doInBackground(Void... temp) {
+            boolean uploadResult = true;
+
             String migrationCd = getMigrationCd();
+
+            // migrationCdがnullの場合は何らかのエラーなので処理失敗にする
+            if(migrationCd == null){
+                return false;
+            }
 
             List<String> selectedFileList = new ArrayList<String>();
 
@@ -153,35 +168,45 @@ public class SaveServerActivity extends CommonAdsActivity implements View.OnClic
                 }
             }
 
-            for(String fileName : selectedFileList) {
+            for (String fileName : selectedFileList) {
                 File file = getFileStreamPath(fileName);
-                S3Manager.S3Upload(migrationCd+"/", fileName, file);
+                boolean result = S3Manager.S3Upload(migrationCd + "/", fileName, file);
+                if (result == false) {
+                    uploadResult = false;
+                    break;
+                }
             }
 
-            Date date = ConfigManager.getLastMigrationDate();
-            int count = ConfigManager.getMigrationCount();
-            if(Utility.isToday(date)){
-                count++;
-            } else {
-                count = 1;
+            // 全件アップロードに成功したら機種変更コードをConfigに書き込む
+            if(uploadResult == true) {
+                Date date = ConfigManager.getLastMigrationDate();
+                int count = ConfigManager.getMigrationCount();
+                if (Utility.isToday(date)) {
+                    count++;
+                } else {
+                    count = 1;
+                }
+
+                ConfigManager.setLastMigrationCd(migrationCd);
+                ConfigManager.setLastMigrationDate(new Date());
+                ConfigManager.setMigrationCount(count);
             }
 
-            ConfigManager.setLastMigrationCd(migrationCd);
-            ConfigManager.setLastMigrationDate(new Date());
-            ConfigManager.setMigrationCount(count);
-
-            return null;
+            return uploadResult;
         }
 
         @Override
-        protected void onPostExecute(Void temp) {
-            updateLastMigrationInfo();
-
+        protected void onPostExecute(Boolean result) {
             if (dialog != null && this.dialog.isShowing()) {
                 dialog.dismiss();
             }
 
-            Toast.makeText(SaveServerActivity.this, "機種変更コードを発行しました。", Toast.LENGTH_LONG).show();
+            if(result == true) {
+                updateLastMigrationInfo();
+                Toast.makeText(SaveServerActivity.this, "機種変更コードを発行しました。", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(SaveServerActivity.this, "機種変更コードの発行に失敗しました。ネットワーク接続を確認して再度お試しください。", Toast.LENGTH_LONG).show();
+            }
         }
 
     }
@@ -207,6 +232,9 @@ public class SaveServerActivity extends CommonAdsActivity implements View.OnClic
         @Override
         protected Void doInBackground(Void... temp) {
             String s3InfoFilePath = S3Manager.S3Download("","info_android.txt");
+            if(s3InfoFilePath == null){
+                return null;
+            }
 
             String infoFileString = Utility.getStringFromFile(s3InfoFilePath);
             if(infoFileString != null) {

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -60,6 +61,9 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
 
         Button loadServerButton = (Button)findViewById(R.id.load_server_button);
         loadServerButton.setOnClickListener(this);
+
+        Button privacyPolicyButton = (Button)findViewById(R.id.privacy_policy_button);
+        privacyPolicyButton.setOnClickListener(this);
 
         // 未購入のアドオンがあればIabHelperをセットアップ
         if(ConfigManager.isShowAds() == true || ConfigManager.isUseMigrationCd() == false) {
@@ -180,6 +184,9 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
             case R.id.load_server_button:
                 checkUseMigrationCd();
                 break;
+            case R.id.privacy_policy_button:
+                openPrivacyPolicy();
+                break;
         }
     }
 
@@ -257,6 +264,9 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
             if (purchaseMig != null) {
                 purchasedUseMigrationCd = true;
                 Log.e("IAB", "「機種変更コード利用」を購入済みです。");
+
+                // テストコード・購入済みを解除
+                // iabHelper.consumeAsync(purchaseMig, consumeFinishedListener);
             }
 
         }
@@ -307,7 +317,7 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
     };
 
     // テストコード
-    /*
+/*
     IabHelper.OnConsumeFinishedListener consumeFinishedListener = new IabHelper.OnConsumeFinishedListener() {
         public void onConsumeFinished(Purchase purchase, IabResult result) {
             if (result.isSuccess()) {
@@ -319,7 +329,7 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
             }
         }
     };
-    */
+*/
 
     public static class CustomDialogFragment extends DialogFragment {
         @Override
@@ -328,7 +338,7 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
 
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
             // builder.setTitle("");
-            builder.setMessage("機種変更コードを使うにはアドオンの入手が必要です。");
+            builder.setMessage("機種変更コードを使うにはアドオンの入手が必要です。\n（一度アドオンを入手すると何度でも機種変更コードを利用できます）");
             builder.setPositiveButton("アドオン入手", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -364,6 +374,12 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
 
     private void moveLoadServerActivity(){
         Intent intent = new Intent(this, LoadServerActivity.class);
+        startActivity(intent);
+    }
+
+    private void openPrivacyPolicy(){
+        Uri uri = Uri.parse("https://s3-ap-northeast-1.amazonaws.com/baseballrecorder/privacy_policy.html");
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         startActivity(intent);
     }
 

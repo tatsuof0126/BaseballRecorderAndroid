@@ -77,6 +77,8 @@ public class GameResultListActivity extends CommonAdsActivity implements View.On
     protected void onResume(){
         super.onResume();
 
+        // Log.e("onResume", "isAds : "+isAds);
+
         adjustViewHeight();
 
         // データが更新されていれば表示を更新する

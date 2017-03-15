@@ -135,7 +135,11 @@ public class LoadServerActivity  extends CommonAdsActivity implements View.OnCli
         @Override
         protected String doInBackground(Void... temp) {
             List<String> filelist = S3Manager.S3GetFileList(migrationCd+"/");
-            if(filelist != null && filelist.size() == 0){
+            if(filelist == null){
+                return "データの取得に失敗しました。ネットワーク接続を確認して再度お試しください。";
+            }
+
+            if(filelist.size() == 0){
                 return "データが存在しません。機種変更コードが正しいかどうかを確認してください。";
             }
 
@@ -148,6 +152,10 @@ public class LoadServerActivity  extends CommonAdsActivity implements View.OnCli
                 }
 
                 String filePath = S3Manager.S3Download(fileKey);
+                if(filePath == null){
+                    continue;
+                }
+
                 String fileString = Utility.getStringFromFile(filePath);
 
                 Log.e("DOWNLOAD KEY", fileKey);
@@ -224,6 +232,9 @@ public class LoadServerActivity  extends CommonAdsActivity implements View.OnCli
         @Override
         protected Void doInBackground(Void... temp) {
             String s3InfoFilePath = S3Manager.S3Download("","info_android.txt");
+            if(s3InfoFilePath == null){
+                return null;
+            }
 
             String infoFileString = Utility.getStringFromFile(s3InfoFilePath);
             if(infoFileString != null) {

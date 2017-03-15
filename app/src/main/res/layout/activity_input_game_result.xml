@@ -216,7 +216,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="先行/後攻"
+                        android:text="先攻/後攻"
                         android:id="@+id/textView17" />
 
                     <Space

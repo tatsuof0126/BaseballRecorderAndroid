@@ -32,19 +32,36 @@ public class S3Manager {
         AWSCredentials credentials = new BasicAWSCredentials(S3Define.AWS_KEY, S3Define.AWS_SECRET);
         AmazonS3 s3 = new AmazonS3Client(credentials);
 
-        TransferUtility transferUtility = new TransferUtility(s3, BaseballRecorderApplication.getInstance());
+        final TransferUtility transferUtility = new TransferUtility(s3, BaseballRecorderApplication.getInstance());
 
         final S3Result s3Result = new S3Result();
         s3Result.setStatus(S3Result.STATUS_CONNECTING);
 
-        TransferObserver observer = transferUtility.upload(S3_BUCKET, prefix+fileName, file);
+        final TransferObserver observer = transferUtility.upload(S3_BUCKET, prefix+fileName, file);
         observer.setTransferListener(new TransferListener() {
             @Override
             public void onStateChanged(int id, TransferState state) {
                 switch (state) {
                     case COMPLETED:
-                        // ダウンロード完了時
+                        // アップロード完了時
                         s3Result.setStatus(S3Result.STATUS_COMPLETE);
+                        break;
+                    case CANCELED:
+                        // キャンセル時
+                        s3Result.setStatus(S3Result.STATUS_ERROR);
+                        break;
+                    case FAILED:
+                        // アップロード失敗時
+                        s3Result.setStatus(S3Result.STATUS_ERROR);
+                        break;
+                    case WAITING_FOR_NETWORK:
+                        // ネットワーク待ちになったらキャンセルする
+                        transferUtility.cancel(observer.getId());
+                        s3Result.setStatus(S3Result.STATUS_ERROR);
+                        break;
+                    case UNKNOWN:
+                        // 不明なステータスの時
+                        s3Result.setStatus(S3Result.STATUS_ERROR);
                         break;
                 }
             }
@@ -55,6 +72,7 @@ public class S3Manager {
 
             @Override
             public void onError(int id, Exception ex) {
+                ex.printStackTrace();
                 s3Result.setStatus(S3Result.STATUS_ERROR);
             }
         });
@@ -74,25 +92,30 @@ public class S3Manager {
 
     public static List<String> S3GetFileList(String prefix){
         List<String> fileList = new ArrayList<String>();
+        try {
+            AWSCredentials credentials = new BasicAWSCredentials(S3Define.AWS_KEY, S3Define.AWS_SECRET);
+            AmazonS3 s3 = new AmazonS3Client(credentials);
 
-        AWSCredentials credentials = new BasicAWSCredentials(S3Define.AWS_KEY, S3Define.AWS_SECRET);
-        AmazonS3 s3 = new AmazonS3Client(credentials);
+            ListObjectsRequest request = new ListObjectsRequest()
+                    .withBucketName(S3_BUCKET)
+                    .withPrefix(prefix);
+            ObjectListing list = s3.listObjects(request);
 
-        ListObjectsRequest request = new ListObjectsRequest()
-                .withBucketName(S3_BUCKET)
-                .withPrefix(prefix);
-        ObjectListing list = s3.listObjects(request);
+            // フォルダ一覧
+            // List<String> folders = list.getCommonPrefixes();
+            // for(String folder : folders){
+            //   Log.e("FOLDERS", folder);
+            // }
 
-        // フォルダ一覧
-        // List<String> folders = list.getCommonPrefixes();
-        // for(String folder : folders){
-        //   Log.e("FOLDERS", folder);
-        // }
+            List<S3ObjectSummary> objects = list.getObjectSummaries();
+            for (S3ObjectSummary object : objects) {
+                fileList.add(object.getKey());
+                Log.e("OBJECTS", object.getKey());
+            }
 
-        List<S3ObjectSummary> objects = list.getObjectSummaries();
-        for(S3ObjectSummary object : objects) {
-            fileList.add(object.getKey());
-            Log.e("OBJECTS", object.getKey());
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
         }
 
         return fileList;
@@ -110,12 +133,12 @@ public class S3Manager {
         final S3Result s3Result = new S3Result();
         s3Result.setStatus(S3Result.STATUS_CONNECTING);
 
-        TransferUtility transferUtility = new TransferUtility(s3, application);
+        final TransferUtility transferUtility = new TransferUtility(s3, application);
 
         File file = application.getFileStreamPath("tempfile.tmp");
         file.delete();
 
-        TransferObserver observer = transferUtility.download(S3_BUCKET, key, file);
+        final TransferObserver observer = transferUtility.download(S3_BUCKET, key, file);
         observer.setTransferListener(new TransferListener() {
             @Override
             public void onStateChanged(int id, TransferState state) {
@@ -123,6 +146,23 @@ public class S3Manager {
                     case COMPLETED:
                         // ダウンロード完了時
                         s3Result.setStatus(S3Result.STATUS_COMPLETE);
+                        break;
+                    case CANCELED:
+                        // キャンセル時
+                        s3Result.setStatus(S3Result.STATUS_ERROR);
+                        break;
+                    case FAILED:
+                        // アップロード失敗時
+                        s3Result.setStatus(S3Result.STATUS_ERROR);
+                        break;
+                    case WAITING_FOR_NETWORK:
+                        // ネットワーク待ちになったらキャンセルする
+                        transferUtility.cancel(observer.getId());
+                        s3Result.setStatus(S3Result.STATUS_ERROR);
+                        break;
+                    case UNKNOWN:
+                        // 不明なステータスの時
+                        s3Result.setStatus(S3Result.STATUS_ERROR);
                         break;
                 }
             }

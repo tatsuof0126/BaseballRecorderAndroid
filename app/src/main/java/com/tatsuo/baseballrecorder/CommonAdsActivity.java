@@ -17,7 +17,7 @@ public class CommonAdsActivity extends AppCompatActivity {
 
     // protected static ADG adg = null;
     protected AdView gadView = null;
-    protected static boolean isAds = false;
+    protected boolean isAds = false;
 
     public static final String GAD_APP_ID = "ca-app-pub-6719193336347757~3537491855";
     public static final String GAD_UNIT_ID = "ca-app-pub-6719193336347757/5014225053";
