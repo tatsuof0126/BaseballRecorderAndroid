@@ -134,6 +134,22 @@ public class ConfigManager {
         editor.commit();
     }
 
+    public static String getLastMigrationPassword(){
+        Context context = BaseballRecorderApplication.getInstance();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getString("MIGRATION_PASSWORD","");
+    }
+
+    public static void setLastMigrationPassword(String lastMigrationPassword){
+        Context context = BaseballRecorderApplication.getInstance();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString("MIGRATION_PASSWORD", lastMigrationPassword);
+        editor.commit();
+    }
+
     public static Date getLastMigrationDate(){
         Context context = BaseballRecorderApplication.getInstance();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);

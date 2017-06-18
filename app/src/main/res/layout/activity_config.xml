@@ -70,11 +70,11 @@
                         android:layout_height="20dp" />
 
                     <Button
+                        android:id="@+id/save_server_button"
                         style="?android:attr/buttonStyleSmall"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="機種変更コードを発行"
-                        android:id="@+id/save_server_button" />
+                        android:text="データバックアップ(機種変更用)" />
 
                 </LinearLayout>
 
@@ -89,11 +89,11 @@
                         android:layout_height="20dp" />
 
                     <Button
+                        android:id="@+id/load_server_button"
                         style="?android:attr/buttonStyleSmall"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="機種変更コードを使う"
-                        android:id="@+id/load_server_button" />
+                        android:text="バックアップデータ取り出し" />
 
                 </LinearLayout>
 

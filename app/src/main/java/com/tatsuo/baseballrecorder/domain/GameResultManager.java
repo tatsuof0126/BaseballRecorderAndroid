@@ -2,6 +2,8 @@ package com.tatsuo.baseballrecorder.domain;
 
 import android.app.Activity;
 
+import com.tatsuo.baseballrecorder.aws.S3Manager;
+
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -720,6 +722,74 @@ public class GameResultManager {
         }
 
         return id;
+    }
+
+    public static String getMigrationCd(){
+        int migrationCdInt = 0;
+        while(true){
+            migrationCdInt = (int) (Math.random() * 90000000) + 10000000;
+
+            // Androidで発行するIDは3で割ると余りが1であることにする
+            if(migrationCdInt % 3 != 1){
+                continue;
+            }
+
+            List<String> filelist = S3Manager.S3GetFileList(migrationCdInt+"/");
+
+            // nullが返ってきた場合は通信失敗
+            if(filelist == null){
+                return null;
+            }
+
+            // 空のリストが返ってきた場合はそのIDは使える
+            if(filelist.size() == 0){
+                break;
+            }
+        }
+
+        return ""+migrationCdInt;
+    }
+
+    // MigrationPasswordの生成方法
+    // １桁目：１桁目〜４桁目を７倍したときの先頭１桁
+    // ２桁目：１桁目〜４桁目を７倍したときの末尾１桁
+    // ３桁目：１桁目〜４桁目を７倍したときの末尾２桁
+    // ４桁目：５桁目〜８桁目を３倍したときの末尾１桁
+    // ５桁目：５桁目〜８桁目を３倍したときの末尾２桁
+    // ６桁目：５桁目〜８桁目を３倍したときの末尾３桁
+    public static String getMigrationPassword(String migrationCd){
+        if(migrationCd == null || migrationCd.length() < 8){
+            return null;
+        }
+
+        String id1234 = migrationCd.substring(0, 4);
+        String id5678 = migrationCd.substring(4, 8);
+
+        String id1234By7 = ""+Integer.parseInt(id1234)*7;
+        String id5678By3 = ""+Integer.parseInt(id5678)*3;
+
+        String password1 = id1234By7.substring(0, 1);
+        String password2 = id1234By7.substring(id1234By7.length()-1, id1234By7.length());
+        String password3 = "0";
+        if(id1234By7.length() >= 2) {
+            password3 = id1234By7.substring(id1234By7.length()-2, id1234By7.length()-1);
+        }
+        String password4 = id5678By3.substring(id5678By3.length()-1, id5678By3.length());
+        String password5 = "0";
+        if(id5678By3.length() >= 2) {
+            password5 = id5678By3.substring(id5678By3.length()-2, id5678By3.length()-1);
+        }
+        String password6 = "0";
+        if(id5678By3.length() >= 3) {
+            password6 = id5678By3.substring(id5678By3.length()-3, id5678By3.length()-2);
+        }
+
+        // Log.e("MIGRATIONCD", migrationCd);
+        // Log.e("id1234By7", id1234By7);
+        // Log.e("id5678By3", id5678By3);
+        // Log.e("PASSWORD", password1 + password2 + password3 + password4 + password5 + password6);
+
+        return password1 + password2 + password3 + password4 + password5 + password6;
     }
 
 }

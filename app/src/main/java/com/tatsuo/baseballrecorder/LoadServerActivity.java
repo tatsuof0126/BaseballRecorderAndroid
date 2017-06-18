@@ -12,6 +12,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.tatsuo.baseballrecorder.aws.S3Manager;
 import com.tatsuo.baseballrecorder.domain.ConfigManager;
 import com.tatsuo.baseballrecorder.domain.GameResult;
@@ -90,6 +92,10 @@ public class LoadServerActivity  extends CommonAdsActivity implements View.OnCli
             return;
         }
 
+        Tracker tracker = ((BaseballRecorderApplication)getApplication()).getTracker();
+        tracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Button").setAction("Push").setLabel("バックアップデータ取り出し画面―バックアップデータ取り出し").build());
+
         LoadServerTask task = new LoadServerTask(migrationCd);
         task.execute();
     }
@@ -98,8 +104,12 @@ public class LoadServerActivity  extends CommonAdsActivity implements View.OnCli
         TextView migrationCdText = (TextView)findViewById(R.id.migration_cd);
         String migrationCd = migrationCdText.getText().toString();
 
-        if(migrationCd == null || "".equals(migrationCd)){
-            Toast.makeText(this, "機種変更コードを入力してください。", Toast.LENGTH_SHORT).show();
+        TextView migrationPasswordText = (TextView)findViewById(R.id.migration_password);
+        String migrationPassword = migrationPasswordText.getText().toString();
+
+        if(migrationCd == null || "".equals(migrationCd) ||
+                migrationPassword == null || "".equals(migrationPassword)){
+            Toast.makeText(this, "IDとパスワードを入力してください。", Toast.LENGTH_SHORT).show();
             return false;
         }
 
@@ -108,7 +118,23 @@ public class LoadServerActivity  extends CommonAdsActivity implements View.OnCli
             migrationCdInt = Integer.parseInt(migrationCd);
         } catch (NumberFormatException nfe){}
         if(migrationCdInt < 10000000 || migrationCdInt > 99999999){
-            Toast.makeText(this, "機種変更コードは8桁の数字を入力してください。", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "IDは8桁の数字を入力してください。", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        int migrationPasswordInt = 0;
+        try {
+            migrationPasswordInt = Integer.parseInt(migrationPassword);
+        } catch (NumberFormatException nfe){}
+        if(migrationPasswordInt < 100000 || migrationPasswordInt > 999999){
+            Toast.makeText(this, "パスワードは6桁の数字を入力してください。", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // パスワードが合っているかをチェック（古いAndroid対応のため999999はOKとする）
+        String originPassword = GameResultManager.getMigrationPassword(migrationCd);
+        if(migrationPassword.equals("999999") == false && migrationPassword.equals(originPassword) == false){
+            Toast.makeText(this, "ID・パスワードが違います。もう一度入力してください。", Toast.LENGTH_SHORT).show();
             return false;
         }
 
@@ -140,7 +166,7 @@ public class LoadServerActivity  extends CommonAdsActivity implements View.OnCli
             }
 
             if(filelist.size() == 0){
-                return "データが存在しません。機種変更コードが正しいかどうかを確認してください。";
+                return "データが存在しません。IDとパスワードが正しいかどうかを確認してください。";
             }
 
             int datacount = 0;

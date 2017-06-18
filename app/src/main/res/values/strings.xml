@@ -8,8 +8,8 @@
     <string name="title_activity_batting_analysis">打撃分析</string>
     <string name="title_activity_pitching_statistics">投手成績</string>
     <string name="title_activity_config">設定</string>
-    <string name="title_activity_save_server">機種変更コードを発行</string>
-    <string name="title_activity_load_server">機種変更コードを使う</string>
+    <string name="title_activity_save_server">データバックアップ</string>
+    <string name="title_activity_load_server">バックアップデータ取り出し</string>
 
     <!-- 本番 -->
     <string name="banner_ad_unit_id">ca-app-pub-6719193336347757/5014225053</string>

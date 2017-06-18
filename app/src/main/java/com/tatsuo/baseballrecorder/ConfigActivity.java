@@ -219,7 +219,7 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
     }
 
     private void purchaseUseMigrationCd(){
-        // 機種変更コード利用の購入手続き
+        // バックアップデータ取り出しの購入手続き
         try {
             List additionalSkuList = new ArrayList();
             additionalSkuList.add(PRODUCT_ID_USE_MIGRATION_CD);
@@ -263,7 +263,7 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
             Purchase purchaseMig = inventory.getPurchase(PRODUCT_ID_USE_MIGRATION_CD);
             if (purchaseMig != null) {
                 purchasedUseMigrationCd = true;
-                Log.e("IAB", "「機種変更コード利用」を購入済みです。");
+                Log.e("IAB", "「バックアップデータ取り出し」を購入済みです。");
 
                 // テストコード・購入済みを解除
                 // iabHelper.consumeAsync(purchaseMig, consumeFinishedListener);
@@ -308,9 +308,9 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
                 Log.e("IAB", "orderIdは：" + purchase.getOrderId());
                 Log.e("IAB", "INAPP_PURCHASE_DATAのJSONは：" + purchase.getOriginalJson());
 
-                // 機種変更コード利用をONにする
+                // バックアップデータ取り出しをONにする
                 ConfigManager.setUseMigrationCd(true);
-                Utility.showAlertDialog(ConfigActivity.this, "機種変更コード利用アドオンを購入しました。機種変更コードが利用できるようになりました。");
+                Utility.showAlertDialog(ConfigActivity.this, "バックアップデータ取り出しアドオンを購入しました。バックアップデータが取り出せるようになりました。");
             }
 
         }
@@ -338,7 +338,7 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
 
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
             // builder.setTitle("");
-            builder.setMessage("機種変更コードを使うにはアドオンの入手が必要です。\n（一度アドオンを入手すると何度でも機種変更コードを利用できます）");
+            builder.setMessage("バックアップデータ取り出しをするにはアドオンの入手が必要です。\n（一度アドオンを入手すると何度でも取り出せます）");
             builder.setPositiveButton("アドオン入手", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -353,7 +353,7 @@ public class ConfigActivity extends CommonAdsActivity implements View.OnClickLis
     }
 
     private void checkUseMigrationCd(){
-        // すでに機種変更コードを購入済みだった場合はフラグをONする
+        // すでにバックアップデータ取り出しを購入済みだった場合はフラグをONする
         if(purchasedUseMigrationCd == true){
             ConfigManager.setUseMigrationCd(true);
         }

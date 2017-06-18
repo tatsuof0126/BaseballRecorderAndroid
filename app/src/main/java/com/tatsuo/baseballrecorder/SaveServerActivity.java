@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.tatsuo.baseballrecorder.aws.S3Manager;
 import com.tatsuo.baseballrecorder.domain.ConfigManager;
 import com.tatsuo.baseballrecorder.domain.GameResult;
@@ -42,9 +44,19 @@ public class SaveServerActivity extends CommonAdsActivity implements View.OnClic
     }
 
     private void updateLastMigrationInfo() {
-        TextView migrationCdText = (TextView) findViewById(R.id.migration_cd);
         String migrationCd = ConfigManager.getLastMigrationCd();
-        migrationCdText.setText("機種変更コード：" + migrationCd);
+        String migrationPassword = ConfigManager.getLastMigrationPassword();
+        // 機種変更コード時代向けの対応（パスワードだけ空の場合は999999にする）
+        if(migrationCd != null && "".equals(migrationCd) == false &&
+                (migrationPassword == null || "".equals(migrationPassword))){
+            migrationPassword = "999999";
+        }
+
+        TextView migrationCdText = (TextView) findViewById(R.id.migration_cd);
+        migrationCdText.setText("ＩＤ：" + migrationCd);
+
+        TextView migrationPasswordText = (TextView) findViewById(R.id.migration_password);
+        migrationPasswordText.setText("パスワード：" + migrationPassword);
 
         TextView migrationDateText = (TextView) findViewById(R.id.migration_date);
         String migrationDateStr = "";
@@ -96,7 +108,7 @@ public class SaveServerActivity extends CommonAdsActivity implements View.OnClic
         int count = ConfigManager.getMigrationCount();
         Date date = ConfigManager.getLastMigrationDate();
         if(Utility.isToday(date) && count >= 5){
-            Toast.makeText(this, "１日に発行できる機種変更コードは５個までです。", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "１日にできるバックアップは５回までです。", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -107,29 +119,12 @@ public class SaveServerActivity extends CommonAdsActivity implements View.OnClic
             }
         }
 
+        Tracker tracker = ((BaseballRecorderApplication)getApplication()).getTracker();
+        tracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Button").setAction("Push").setLabel("データバックアップ画面―データバックアップ").build());
+
         SaveServerTask task = new SaveServerTask();
         task.execute();
-    }
-
-    private String getMigrationCd(){
-        int migrationCdInt = 0;
-        while(true){
-            migrationCdInt = (int) (Math.random() * 90000000) + 10000000;
-
-            List<String> filelist = S3Manager.S3GetFileList(migrationCdInt+"/");
-
-            // nullが返ってきた場合は通信失敗
-            if(filelist == null){
-                return null;
-            }
-
-            // 空のリストが返ってきた場合はその機種変更コードは使える
-            if(filelist.size() == 0){
-                break;
-            }
-        }
-
-        return ""+migrationCdInt;
     }
 
     private void updateS3Info(boolean showDialog){
@@ -152,10 +147,11 @@ public class SaveServerActivity extends CommonAdsActivity implements View.OnClic
         protected Boolean doInBackground(Void... temp) {
             boolean uploadResult = true;
 
-            String migrationCd = getMigrationCd();
+            String migrationCd = GameResultManager.getMigrationCd();
+            String migrationPassword = GameResultManager.getMigrationPassword(migrationCd);
 
-            // migrationCdがnullの場合は何らかのエラーなので処理失敗にする
-            if(migrationCd == null){
+            // migrationCdやmigrationPasswordがnullの場合は何らかのエラーなので処理失敗にする
+            if(migrationCd == null || migrationPassword == null){
                 return false;
             }
 
@@ -177,7 +173,7 @@ public class SaveServerActivity extends CommonAdsActivity implements View.OnClic
                 }
             }
 
-            // 全件アップロードに成功したら機種変更コードをConfigに書き込む
+            // 全件アップロードに成功したらID・パスワードをConfigに書き込む
             if(uploadResult == true) {
                 Date date = ConfigManager.getLastMigrationDate();
                 int count = ConfigManager.getMigrationCount();
@@ -188,6 +184,7 @@ public class SaveServerActivity extends CommonAdsActivity implements View.OnClic
                 }
 
                 ConfigManager.setLastMigrationCd(migrationCd);
+                ConfigManager.setLastMigrationPassword(migrationPassword);
                 ConfigManager.setLastMigrationDate(new Date());
                 ConfigManager.setMigrationCount(count);
             }
@@ -203,9 +200,9 @@ public class SaveServerActivity extends CommonAdsActivity implements View.OnClic
 
             if(result == true) {
                 updateLastMigrationInfo();
-                Toast.makeText(SaveServerActivity.this, "機種変更コードを発行しました。", Toast.LENGTH_LONG).show();
+                Toast.makeText(SaveServerActivity.this, "データをバックアップしました。\nIDとパスワードは画面を確認してください。", Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(SaveServerActivity.this, "機種変更コードの発行に失敗しました。ネットワーク接続を確認して再度お試しください。", Toast.LENGTH_LONG).show();
+                Toast.makeText(SaveServerActivity.this, "データのバックアップに失敗しました。ネットワーク接続を確認して再度お試しください。", Toast.LENGTH_LONG).show();
             }
         }
 

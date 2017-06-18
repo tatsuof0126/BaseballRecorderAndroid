@@ -9,15 +9,15 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="65dp"
         android:gravity="center_vertical|left">
 
         <TextView
-            android:text="データを他の端末に移行するための機種変更コードを発行します。\nコードは発行日から１ヶ月有効です。"
+            android:id="@+id/textView56"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textView56"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:text="データを他の端末に移行するために\nＩＤ・パスワードを発行します。\nデータは１ヶ月間保存されます。" />
 
     </LinearLayout>
 
@@ -30,11 +30,11 @@
         android:paddingRight="20dp">
 
         <Button
+            android:id="@+id/save_server_button"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="機種変更コード発行"
-            android:id="@+id/save_server_button" />
+            android:text="データバックアップ" />
 
     </LinearLayout>
 
@@ -45,7 +45,7 @@
         android:gravity="center_vertical|left">
 
         <TextView
-            android:text="前回発行した機種変更コード"
+            android:text="前回のバックアップ"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textView57"
@@ -61,10 +61,26 @@
         android:paddingRight="10dp">
 
         <TextView
-            android:text="機種変更コード："
+            android:text="ＩＤ："
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/migration_cd"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:gravity="center_vertical|left"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:text="パスワード："
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/migration_password"
             android:layout_weight="1" />
     </LinearLayout>
 

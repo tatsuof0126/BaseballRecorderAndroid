@@ -87,7 +87,8 @@
             android:layout_height="match_parent"
             android:id="@+id/ads"
             android:gravity="center_vertical|center_horizontal"
-            android:visibility="invisible"></LinearLayout>
+            android:visibility="invisible">
+        </LinearLayout>
 
     </LinearLayout>
 </RelativeLayout>

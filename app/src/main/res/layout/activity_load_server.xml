@@ -12,7 +12,7 @@
         android:gravity="center_vertical|left">
 
         <TextView
-            android:text="発行済の機種変更コードを入力してください。"
+            android:text="バックアップ時に発行されたＩＤとパスワードを入力してください。"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/text_message"
@@ -27,33 +27,78 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="45dp"
         android:gravity="center_vertical|left"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp">
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="ＩＤ"
+            android:layout_weight="0.35"
+            android:gravity="left" />
 
         <EditText
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:inputType="text|number"
+            android:ems="10"
             android:id="@+id/migration_cd"
-            android:inputType="text|number" />
+            android:layout_weight="0.65"
+            android:gravity="left" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:gravity="center_vertical|left"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.35"
+            android:gravity="left"
+            android:text="パスワード"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/migration_password"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.65"
+            android:ems="10"
+            android:gravity="left"
+            android:inputType="numberPassword" />
 
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
+        android:layout_height="10dp">
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="50dp"
         android:gravity="center_vertical|left"
+        android:orientation="horizontal"
         android:paddingLeft="40dp"
         android:paddingRight="40dp">
 
         <Button
+            android:id="@+id/load_server_button"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="機種変更コードを使う"
-            android:id="@+id/load_server_button" />
+            android:text="バックアップデータ取り出し" />
 
     </LinearLayout>
 
